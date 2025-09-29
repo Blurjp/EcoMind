@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ecomind Options</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🌱 Ecomind Settings</h1>
+      <p>Configure your AI usage tracking and environmental impact estimation</p>
+    </div>
+
+    <!-- Backend Configuration -->
+    <div class="section">
+      <div class="section-title">
+        🌐 Backend Configuration
+        <div id="connectionStatus" class="status-indicator disabled">
+          <div class="status-dot"></div>
+          Not configured
+        </div>
+      </div>
+      <div class="section-description">
+        Configure connection to a backend service for centralized tracking and analysis.
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="baseUrl">Backend URL</label>
+        <input type="url" id="baseUrl" class="form-input" placeholder="https://api.example.com">
+        <div class="help-text">Base URL of your backend API service</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="userId">User ID</label>
+        <input type="text" id="userId" class="form-input" placeholder="user123">
+        <div class="help-text">Unique identifier for your usage data</div>
+      </div>
+
+      <div class="form-group">
+        <button id="testConnectionBtn" class="btn btn-secondary">Test Connection</button>
+      </div>
+    </div>
+
+    <!-- Privacy Settings -->
+    <div class="section">
+      <div class="section-title">🔒 Privacy Settings</div>
+      <div class="section-description">
+        Control how your usage data is handled and shared.
+      </div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="privacyLocalOnly">
+        <label for="privacyLocalOnly">Local-only mode (never send data to backend)</label>
+      </div>
+      <div class="help-text">When enabled, all data stays on your device regardless of other settings</div>
+
+      <div class="checkbox-group">
+        <input type="checkbox" id="telemetryEnabled">
+        <label for="telemetryEnabled">Enable telemetry (send data to backend)</label>
+      </div>
+      <div class="help-text">Send anonymous usage data to configured backend for analysis</div>
+
+      <div class="warning" id="privacyWarning" style="display: none;">
+        ⚠️ Privacy mode is enabled. Telemetry will be disabled regardless of the setting above.
+      </div>
+    </div>
+
+    <!-- Tracking Providers -->
+    <div class="section">
+      <div class="section-title">🎯 Tracking Providers</div>
+      <div class="section-description">
+        Manage which AI service providers to track.
+      </div>
+
+      <div class="providers-list" id="providersList">
+        <!-- Default providers will be populated here -->
+      </div>
+
+      <div class="custom-providers">
+        <label class="form-label">Custom Providers</label>
+        <div class="custom-provider-input">
+          <input type="text" id="customProviderInput" class="form-input" placeholder="api.custom-ai.com">
+          <button id="addProviderBtn" class="btn btn-secondary">Add</button>
+        </div>
+        <div class="help-text">Add additional domains to track (e.g., api.custom-ai.com or *.custom-ai.com for subdomains)</div>
+        
+        <div id="customProvidersList" class="providers-list" style="margin-top: 12px;">
+          <!-- Custom providers will be populated here -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Environmental Estimation -->
+    <div class="section">
+      <div class="section-title">🌍 Environmental Estimation</div>
+      <div class="section-description">
+        Configure parameters for calculating environmental impact estimates.
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="kwhPerCall">kWh per API call</label>
+          <input type="number" id="kwhPerCall" class="form-input" step="0.0001" min="0">
+          <div class="help-text">Energy consumption per API request</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="pue">Power Usage Effectiveness (PUE)</label>
+          <input type="number" id="pue" class="form-input" step="0.1" min="1">
+          <div class="help-text">Data center efficiency multiplier</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="waterLPerKwh">Water (L per kWh)</label>
+          <input type="number" id="waterLPerKwh" class="form-input" step="0.1" min="0">
+          <div class="help-text">Water consumption per kWh</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="co2KgPerKwh">CO₂ (kg per kWh)</label>
+          <input type="number" id="co2KgPerKwh" class="form-input" step="0.01" min="0">
+          <div class="help-text">Carbon emissions per kWh</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button id="resetBtn" class="btn btn-danger">Reset to Defaults</button>
+      <button id="saveBtn" class="btn btn-primary">
+        Save Settings
+        <span id="savedIndicator" class="saved-indicator">✓ Saved</span>
+      </button>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
