@@ -1,0 +1,85 @@
+# Grid Carbon Intensity by Region
+# Source: EPA eGRID, ElectricityMaps, IEA
+# Units: gCO₂ per kWh
+# Updated: 2025-01-01
+
+regions:
+  # United States (by eGRID subregion)
+  US-NEISO:
+    name: "New England ISO"
+    gco2_per_kwh: 250
+
+  US-CAISO:
+    name: "California ISO"
+    gco2_per_kwh: 220
+
+  US-ERCOT:
+    name: "Texas (ERCOT)"
+    gco2_per_kwh: 420
+
+  US-PJM:
+    name: "PJM Interconnection"
+    gco2_per_kwh: 380
+
+  US-MISO:
+    name: "Midcontinent ISO"
+    gco2_per_kwh: 480
+
+  US-SPP:
+    name: "Southwest Power Pool"
+    gco2_per_kwh: 520
+
+  US-NORTHWEST:
+    name: "US Northwest (Hydro)"
+    gco2_per_kwh: 120
+
+  # Europe
+  EU-DE:
+    name: "Germany"
+    gco2_per_kwh: 420
+
+  EU-FR:
+    name: "France (Nuclear)"
+    gco2_per_kwh: 60
+
+  EU-UK:
+    name: "United Kingdom"
+    gco2_per_kwh: 230
+
+  EU-SE:
+    name: "Sweden (Hydro/Nuclear)"
+    gco2_per_kwh: 30
+
+  EU-PL:
+    name: "Poland (Coal)"
+    gco2_per_kwh: 780
+
+  # Asia Pacific
+  APAC-SG:
+    name: "Singapore"
+    gco2_per_kwh: 410
+
+  APAC-JP:
+    name: "Japan"
+    gco2_per_kwh: 500
+
+  APAC-AU-NSW:
+    name: "Australia NSW"
+    gco2_per_kwh: 750
+
+  APAC-IN:
+    name: "India"
+    gco2_per_kwh: 630
+
+  APAC-CN:
+    name: "China"
+    gco2_per_kwh: 555
+
+  # Default/Unknown
+  GLOBAL:
+    name: "Global Average"
+    gco2_per_kwh: 475
+
+  UNKNOWN:
+    name: "Unknown (Conservative)"
+    gco2_per_kwh: 500

@@ -1,0 +1,70 @@
+# Default Environmental Factors for AI Models
+# Sources: Research papers, provider specs, industry averages
+# Units: kWh per API call, PUE (unitless), L per kWh, kg CO₂ per kWh
+
+defaults:
+  pue: 1.5  # Power Usage Effectiveness (datacenter overhead)
+  water_l_per_kwh: 1.8  # Cooling water consumption
+  co2_kg_per_kwh: 0.4  # Global grid average
+
+providers:
+  openai:
+    kwh_per_call: 0.0003  # GPT-3.5/4 class models
+    models:
+      gpt-4o:
+        kwh_per_call: 0.0005
+      gpt-4:
+        kwh_per_call: 0.0006
+      gpt-4-turbo:
+        kwh_per_call: 0.0005
+      gpt-3.5-turbo:
+        kwh_per_call: 0.0002
+      o1-preview:
+        kwh_per_call: 0.0008
+      o1-mini:
+        kwh_per_call: 0.0004
+
+  anthropic:
+    kwh_per_call: 0.0004
+    models:
+      claude-3-opus:
+        kwh_per_call: 0.0007
+      claude-3-sonnet:
+        kwh_per_call: 0.0004
+      claude-3-haiku:
+        kwh_per_call: 0.0001
+      claude-3-5-sonnet:
+        kwh_per_call: 0.0004
+
+  cohere:
+    kwh_per_call: 0.0003
+    models:
+      command-r:
+        kwh_per_call: 0.0004
+      command-r-plus:
+        kwh_per_call: 0.0005
+
+  replicate:
+    kwh_per_call: 0.0005  # Varies widely by model
+
+  together:
+    kwh_per_call: 0.0003
+
+  perplexity:
+    kwh_per_call: 0.0003
+
+  google:
+    kwh_per_call: 0.0003
+    models:
+      gemini-pro:
+        kwh_per_call: 0.0004
+      gemini-ultra:
+        kwh_per_call: 0.0008
+      gemini-flash:
+        kwh_per_call: 0.0001
+
+  selfhost:
+    kwh_per_call: 0.0002  # Assumes local GPU inference
+
+  unknown:
+    kwh_per_call: 0.0003  # Conservative estimate
