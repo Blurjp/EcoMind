@@ -1,0 +1,4 @@
+packages:
+  - 'ui'
+  - 'ext-chrome'
+  - 'sdks/ts'

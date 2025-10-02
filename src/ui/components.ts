@@ -50,7 +50,10 @@ export function showLoading(container: HTMLElement): void {
 }
 
 export function showError(container: HTMLElement, message: string): void {
-  container.innerHTML = `<div class="error">Error: ${message}</div>`;
+  const errorDiv = createElement('div', 'error');
+  errorDiv.textContent = `Error: ${message}`;
+  container.innerHTML = '';
+  container.appendChild(errorDiv);
 }
 
 export function sendMessage<T = any>(

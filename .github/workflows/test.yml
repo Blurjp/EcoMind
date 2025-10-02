@@ -1,0 +1,74 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  test-gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+      - name: Test Gateway
+        run: |
+          cd gateway
+          go test -v ./...
+
+  test-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          pip install uv
+          cd api
+          uv pip install --system -e '.[dev]'
+      - name: Test API
+        run: |
+          cd api
+          pytest
+
+  test-worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install deps
+        run: |
+          pip install uv
+          cd worker
+          uv pip install --system -e '.[dev]'
+      - name: Test Worker
+        run: |
+          cd worker
+          pytest
+
+  test-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: |
+          cd ui
+          npm ci
+      - name: Lint
+        run: |
+          cd ui
+          npm run lint
+      - name: Build
+        run: |
+          cd ui
+          npm run build

@@ -1,0 +1,29 @@
+[project]
+name = "ecomind-worker"
+version = "0.1.0"
+description = "Ecomind worker for event enrichment and aggregation"
+requires-python = ">=3.12"
+dependencies = [
+    "kafka-python>=2.0.2",
+    "sqlalchemy>=2.0.25",
+    "psycopg2-binary>=2.9.9",
+    "pydantic>=2.5.3",
+    "pydantic-settings>=2.1.0",
+    "pyyaml>=6.0.1",
+    "redis>=5.0.1",
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.4",
+    "ruff>=0.1.14",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"

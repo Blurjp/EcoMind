@@ -1,221 +1,401 @@
-# 🌱 Ecomind Chrome Extension
+# 🌱 Ecomind – Enterprise AI Environmental Monitoring Platform
 
-A Chrome Manifest V3 extension that tracks AI API usage and estimates environmental footprint with privacy-first design.
+**Centralized, multi-tenant monitoring for AI/compute usage with energy, water, and CO₂ footprint tracking.**
 
-## Features
+## Overview
 
-- **Privacy-First**: Never logs or transmits prompt text or model outputs
-- **Local Tracking**: Track API calls locally with daily usage statistics
-- **Environmental Impact**: Estimate energy, water, and CO₂ footprint
-- **Provider Support**: Built-in support for OpenAI, Anthropic, Replicate, Together, Cohere, Perplexity, and Google AI
-- **Custom Providers**: Add your own API domains to track
-- **Backend Integration**: Optional backend reporting with configurable endpoints
-- **Daily Reset**: Automatic midnight reset with historical data archiving
+Ecomind is an enterprise-grade platform that provides:
 
-## Installation
+- **Centralized Monitoring**: Track AI API calls across your organization
+- **Environmental Impact**: Convert usage to kWh, liters of water, and kgCO₂ using regional grid factors
+- **Multi-Tenant**: Organizations, teams, users with RBAC
+- **Privacy-First**: Never log prompts or completions, only metadata
+- **Real-Time Alerts**: Slack/Teams/Webhook notifications for thresholds
+- **ESG Reporting**: Generate PDF/CSV reports for compliance
+- **SSO/SAML/OIDC**: Enterprise auth with audit logs
+- **SDKs + Extension**: Easy integration via REST/gRPC, TypeScript/Python SDKs, and browser extension
 
-### Development Setup
+## Architecture
 
-1. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+**Monorepo** with:
 
-2. **Build the extension**:
-   ```bash
-   npm run build
-   ```
+- **Gateway** (Go) – High-throughput ingestion → Kafka/Redpanda
+- **API** (Python FastAPI) – REST/gRPC for queries, admin, billing
+- **Worker** (Python) – Event enrichment, aggregation, alerts
+- **UI** (Next.js) – Dashboards, settings, reports
+- **Extension** (Chrome MV3) – Browser tracking with optional backend sync
+- **SDKs** (TypeScript, Python) – Client libraries
+- **Infra** (Terraform + Helm) – AWS EKS, RDS, MSK, S3
 
-3. **Load unpacked extension in Chrome**:
-   - Open Chrome and go to `chrome://extensions/`
-   - Enable "Developer mode" in the top right
-   - Click "Load unpacked" and select the `ecomind-extension` directory
-   - The extension should appear in your extensions list
+**Data Plane**:
+- Queue: Redpanda/Kafka
+- DB: PostgreSQL + TimescaleDB
+- Cache: Redis
+- Storage: S3
+- Observability: OpenTelemetry, Prometheus, Grafana
 
-### Production Build
+## Quick Start
+
+### Local Development
+
+**Prerequisites**: Docker, pnpm, Go 1.22+, Python 3.12+, Node 20+
 
 ```bash
-npm run build
+# 1. Clone and install
+git clone <repo>
+cd ecomind
+pnpm install
+
+# 2. Start all services
+make dev
+
+# Services:
+# - Gateway:  http://localhost:8080
+# - API:      http://localhost:8000
+# - UI:       http://localhost:3000
+# - Postgres: localhost:5432
+# - Redis:    localhost:6379
+# - Redpanda: localhost:9092
 ```
 
-The built extension will be in the `dist/` directory.
+### Seed Data
 
-## Configuration
-
-### Options Page
-
-Access the options page by:
-- Clicking the extension icon and selecting "Options"
-- Or going to `chrome://extensions/` and clicking "Options" under Ecomind
-
-### Settings
-
-**Backend Configuration:**
-- `Backend URL`: Base URL of your backend API service
-- `User ID`: Unique identifier for your usage data
-
-**Privacy Settings:**
-- `Local-only mode`: Keep all data on device, never send to backend
-- `Enable telemetry`: Send anonymous usage data to backend (when not in local-only mode)
-
-**Custom Providers:**
-- Add additional domains to track (e.g., `api.custom-ai.com` or `*.custom-ai.com`)
-
-**Environmental Parameters:**
-- `kWh per API call`: Energy consumption per request (default: 0.0003)
-- `PUE`: Power Usage Effectiveness multiplier (default: 1.5)
-- `Water (L per kWh)`: Water consumption per kWh (default: 1.8)
-- `CO₂ (kg per kWh)`: Carbon emissions per kWh (default: 0.4)
-
-## Backend API
-
-If you want to use backend reporting, implement these endpoints:
-
-### POST /ingest
-
-Receives usage data:
-
-```json
-{
-  "user_id": "user123",
-  "provider": "openai",
-  "model": "gpt-4",
-  "tokens_in": 0,
-  "tokens_out": 0,
-  "ts": "2023-12-01T15:30:00Z"
-}
+```bash
+make seed
 ```
 
-### GET /today?user_id=<user_id>
+### Test Ingestion
 
-Returns aggregated daily data:
-
-```json
-{
-  "date": "2023-12-01",
-  "call_count": 15,
-  "kwh": 0.0045,
-  "water_liters": 0.0081,
-  "co2_kg": 0.0018,
-  "top_providers": [
-    {"provider": "openai", "count": 10},
-    {"provider": "anthropic", "count": 5}
-  ],
-  "top_models": [
-    {"model": "gpt-4", "count": 8},
-    {"model": "claude-3-sonnet", "count": 5}
-  ]
-}
+```bash
+curl -X POST http://localhost:8080/v1/ingest \
+  -H "Content-Type: application/json" \
+  -d '{
+    "org_id": "org_demo",
+    "user_id": "user_alice",
+    "provider": "openai",
+    "model": "gpt-4o",
+    "tokens_in": 100,
+    "tokens_out": 50,
+    "region": "US-CAISO",
+    "ts": "2025-09-30T12:00:00Z"
+  }'
 ```
 
-### GET /health (optional)
+### Query Aggregates
 
-Health check endpoint for connection testing.
+```bash
+curl "http://localhost:8000/v1/today?org_id=org_demo&user_id=user_alice"
+```
 
-## Privacy
+### Load UI
 
-Ecomind is designed with privacy as the top priority:
+Open http://localhost:3000
 
-- **No Content Logging**: Never accesses, stores, or transmits prompt text or model responses
-- **Minimal Metadata**: Only tracks timestamps, provider names, and model identifiers when detectable
-- **Local-First**: All data can be kept locally on your device
-- **Opt-In Telemetry**: Backend reporting is disabled by default and requires explicit configuration
-- **No Tracking**: No analytics, cookies, or user tracking beyond what you explicitly configure
-
-**Note**: Due to Manifest V3 limitations, model detection from request bodies is limited. The extension primarily tracks API call counts and estimates environmental impact, with model names extracted from URLs when possible.
-
-See [PRIVACY.md](PRIVACY.md) for detailed privacy practices.
-
-## Development
-
-### Scripts
-
-- `npm run dev` - Build in watch mode for development
-- `npm run build` - Production build
-- `npm run lint` - Run ESLint
-- `npm run lint:fix` - Fix ESLint issues
-- `npm run format` - Format code with Prettier
-- `npm run test` - Run tests (when implemented)
-
-### Project Structure
+## Project Structure
 
 ```
-ecomind-extension/
-├── src/
-│   ├── bg/                  # Background scripts
-│   │   ├── service-worker.ts
-│   │   ├── providers.ts
-│   │   ├── storage.ts
-│   │   ├── telemetry.ts
-│   │   └── time.ts
-│   ├── ui/                  # User interface
-│   │   ├── popup.html
-│   │   ├── popup.ts
-│   │   ├── popup.css
-│   │   ├── options.html
-│   │   ├── options.ts
-│   │   ├── options.css
-│   │   └── components.ts
-│   ├── common/              # Shared utilities
-│   │   ├── types.ts
-│   │   ├── constants.ts
-│   │   └── util.ts
-│   └── icons/               # Extension icons
-├── manifest.json            # Extension manifest
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
+ecomind/
+├── gateway/          # Go ingestion service
+├── api/              # Python FastAPI (REST/gRPC)
+├── worker/           # Python event consumers
+├── ui/               # Next.js dashboard
+├── ext-chrome/       # Chrome MV3 extension
+├── sdks/
+│   ├── ts/           # TypeScript SDK
+│   └── python/       # Python SDK
+├── infra/
+│   ├── terraform/    # AWS infrastructure
+│   └── helm/         # Kubernetes charts
+├── ops/              # Runbooks, Grafana dashboards, load tests
+├── docs/             # Architecture, API, Privacy, DPA
+├── docker-compose.dev.yml
+├── Makefile
+├── pnpm-workspace.yaml
 └── README.md
 ```
 
-### Adding New Providers
+## APIs
 
-To add support for a new AI provider:
+### Ingestion
 
-1. Add provider configuration in `src/common/constants.ts`:
-   ```typescript
-   {
-     name: 'newprovider',
-     domains: ['api.newprovider.com'],
-     modelExtractor: (url: string, body?: string) => {
-       // Extract model from URL or request body
-       return 'model-name';
-     }
-   }
-   ```
+**POST /v1/ingest**
+```json
+{
+  "org_id": "org_123",
+  "user_id": "user_abc",
+  "provider": "openai|anthropic|cohere|selfhost",
+  "model": "gpt-4o",
+  "tokens_in": 0,
+  "tokens_out": 0,
+  "region": "US-CAISO",
+  "ts": "2025-09-30T12:00:00Z"
+}
+```
 
-2. Update the manifest.json `host_permissions` if needed.
+### Query
 
-### Testing
+- `GET /v1/today?org_id=X&user_id=Y`
+- `GET /v1/aggregate/daily?org_id=X&from=...&to=...&group_by=provider|model|user`
+- `GET /v1/factors` – View merged default + override factors
+- `POST /v1/reports/esg` – Generate async ESG report (PDF/CSV)
 
-Load the extension in Chrome and:
+### Admin
 
-1. Visit sites that use AI APIs (ChatGPT, Claude, etc.)
-2. Check the popup to see tracked usage
-3. Verify the badge count updates
-4. Test the options page configuration
-5. Try the "Clear Today" functionality
+- `POST /v1/orgs`, `POST /v1/orgs/{id}/users`, `POST /v1/teams`
+- `POST /v1/factors/overrides` – Set org-specific factors
+- `POST /v1/alerts` – Create threshold alerts
+- `GET /v1/audits` – Audit logs
+
+**Full API Docs**: See [docs/API.md](docs/API.md) and [OpenAPI spec](api/openapi.yaml)
+
+## SDKs
+
+### TypeScript
+
+```bash
+npm install @ecomind/sdk
+```
+
+```typescript
+import { EcomindClient } from '@ecomind/sdk';
+
+const client = new EcomindClient({
+  apiKey: 'ek_...',
+  baseUrl: 'https://api.ecomind.example.com',
+  orgId: 'org_123',
+  userId: 'user_abc'
+});
+
+await client.track({
+  provider: 'openai',
+  model: 'gpt-4o',
+  tokensIn: 100,
+  tokensOut: 50
+});
+```
+
+### Python
+
+```bash
+pip install ecomind-sdk
+```
+
+```python
+from ecomind_sdk import EcomindClient
+
+client = EcomindClient(
+    api_key="ek_...",
+    base_url="https://api.ecomind.example.com",
+    org_id="org_123",
+    user_id="user_abc"
+)
+
+client.track(
+    provider="anthropic",
+    model="claude-3-sonnet",
+    tokens_in=200,
+    tokens_out=100
+)
+```
+
+## Browser Extension
+
+Located in `ext-chrome/`. See [ext-chrome/README.md](ext-chrome/README.md).
+
+**Install**:
+1. `cd ext-chrome && npm install && npm run build`
+2. Load unpacked from `ext-chrome/dist/` in Chrome
+
+**Features**:
+- Local tracking or backend sync
+- Privacy-first (no prompt logging)
+- Custom provider domains
+- Configurable environmental factors
+
+## RBAC & Auth
+
+**Roles** (per org):
+- **Owner**: Full control
+- **Admin**: Manage users, teams, factors, alerts
+- **Analyst**: View dashboards, reports
+- **Viewer**: Read-only
+- **Billing**: Manage billing
+
+**SSO**: OIDC/SAML via Auth0/Okta (configurable). Fallback: magic link.
+
+**API Keys**: HMAC or PAT for server-to-server.
+
+## Alerts
+
+Configure thresholds:
+```json
+{
+  "org_id": "org_123",
+  "metric": "co2_kg",
+  "threshold": 10.0,
+  "window": "1d",
+  "channel": "slack",
+  "webhook_url": "https://hooks.slack.com/..."
+}
+```
+
+Supported channels: Slack, Teams, Webhook, Email.
+
+## Environmental Factors
+
+**Defaults** (global):
+- kWh per call, PUE, water L/kWh, CO₂ kg/kWh per provider/model
+
+**Overrides** (org-level):
+- Custom factors for specific models or regions
+- Grid intensity by region code (e.g., `US-CAISO`, `EU-DE`)
+
+**Data sources**:
+- Model energy: Research papers, provider specs
+- Grid CO₂: Real-time APIs (e.g., ElectricityMaps) or static tables
+
+## Reports
+
+Generate ESG reports:
+```bash
+curl -X POST http://localhost:8000/v1/reports/esg \
+  -H "Authorization: Bearer ek_..." \
+  -d '{"org_id":"org_123","from":"2025-01-01","to":"2025-12-31","format":"pdf"}'
+```
+
+Returns: `{"job_id":"...", "status":"pending"}`
+
+Poll or webhook when ready → download from S3.
+
+## Observability
+
+- **Traces**: OpenTelemetry → Jaeger/Tempo
+- **Metrics**: Prometheus (scrape `/metrics`)
+- **Logs**: JSON to stdout
+- **Dashboards**: Grafana (pre-built in `ops/grafana/`)
+
+## Infrastructure
+
+**AWS** (via Terraform):
+- EKS cluster
+- RDS PostgreSQL (TimescaleDB)
+- MSK or Redpanda self-managed
+- ElastiCache Redis
+- S3 for exports
+- CloudFront for UI
+
+**Deploy**:
+```bash
+cd infra/terraform
+terraform init
+terraform apply
+```
+
+**Helm** (Kubernetes):
+```bash
+cd infra/helm
+helm install ecomind ./ecomind-chart
+```
+
+## CI/CD
+
+GitHub Actions workflows in `.github/workflows/`:
+- `test.yml` – Run tests on PRs
+- `build.yml` – Build Docker images
+- `deploy.yml` – Deploy to dev/stage/prod
+
+## Development
+
+### Commands
+
+```bash
+make dev        # Start local stack
+make build      # Build all services
+make test       # Run tests
+make lint       # Lint code
+make seed       # Seed DB
+make loadtest   # k6 load tests
+make clean      # Clean up
+```
+
+### Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+- `DATABASE_URL`
+- `KAFKA_BROKERS`
+- `REDIS_URL`
+- `AUTH0_DOMAIN`, `AUTH0_CLIENT_ID`
+- `STRIPE_SECRET_KEY`
+- `S3_BUCKET`
+
+## Testing
+
+```bash
+# Unit tests
+cd api && pytest
+cd worker && pytest
+cd gateway && go test ./...
+
+# Integration tests (requires docker-compose up)
+pytest tests/integration/
+
+# Load tests
+make loadtest
+```
+
+## Security
+
+- HTTPS/TLS everywhere
+- JWT for auth
+- HMAC for API keys
+- Row-level security (RLS) in Postgres
+- Secrets via AWS Secrets Manager
+- Audit logs for all admin actions
+- CSP headers on UI
+
+## Privacy
+
+- **No prompt/completion logging**
+- Metadata only: timestamps, provider, model, token counts
+- Local-only mode in extension
+- Data retention policies (configurable per org)
+- GDPR/DPA templates in `docs/`
+
+See [PRIVACY.md](docs/PRIVACY.md) for full policy.
+
+## Billing
+
+Stripe integration:
+- Plans: Free (10k calls/mo), Pro (1M calls/mo), Enterprise (custom)
+- Rate limits per plan
+- Webhooks for payment events
+- Admin UI for plan management
+
+## Roadmap
+
+- [ ] Real-time streaming dashboards
+- [ ] Mobile apps (React Native)
+- [ ] More cloud providers (Azure, GCP)
+- [ ] Carbon credit purchase integration
+- [ ] Team-level budgets and quotas
 
 ## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run `npm run lint` and `npm run format`
-5. Test the extension thoroughly
-6. Submit a pull request
+1. Fork repo
+2. Create feature branch
+3. Run `make lint` and `make test`
+4. Submit PR with tests
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License – See [LICENSE](LICENSE)
 
 ## Support
 
-For issues or questions:
-- Open an issue on GitHub
-- Check the browser extension console for error messages
-- Verify your Chrome version supports Manifest V3
+- GitHub Issues: [github.com/ecomind/ecomind](https://github.com/ecomind/ecomind)
+- Docs: [docs.ecomind.example.com](https://docs.ecomind.example.com)
+- Slack: [ecomind.slack.com](https://ecomind.slack.com)
 
 ---
 
-*Ecomind helps you understand the environmental impact of your AI usage while respecting your privacy.*
+**Built with ❤️ for a sustainable AI future.**

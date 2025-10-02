@@ -1,0 +1,48 @@
+{
+  "dashboard": {
+    "title": "Ecomind Overview",
+    "panels": [
+      {
+        "title": "Gateway Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(gateway_requests_total[5m])"
+          }
+        ]
+      },
+      {
+        "title": "API Response Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, api_request_duration_seconds_bucket)"
+          }
+        ]
+      },
+      {
+        "title": "Worker Events Processed",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(worker_events_processed_total[5m])"
+          }
+        ]
+      },
+      {
+        "title": "Total CO2 Today (kg)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(daily_org_agg_co2_kg)"
+          }
+        ]
+      }
+    ],
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}

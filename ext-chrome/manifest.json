@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "Ecomind - AI Sustainability Tracker",
+  "short_name": "Ecomind",
+  "version": "1.0.0",
+  "description": "Privacy-first AI sustainability tracker. Calculate carbon footprint, energy, and water usage for OpenAI, Anthropic, and custom APIs.",
+  "author": "Ecomind Team",
+  "homepage_url": "https://github.com/ecomind/ecomind-extension",
+  "permissions": [
+    "storage",
+    "webRequest",
+    "alarms"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "dist/bg/service-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_popup": "dist/ui/popup.html",
+    "default_title": "Ecomind - Track AI Environmental Impact",
+    "default_icon": {
+      "16": "dist/icons/icon16.png",
+      "48": "dist/icons/icon48.png",
+      "128": "dist/icons/icon128.png"
+    }
+  },
+  "options_page": "dist/ui/options.html",
+  "icons": {
+    "16": "dist/icons/icon16.png",
+    "48": "dist/icons/icon48.png",
+    "128": "dist/icons/icon128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}

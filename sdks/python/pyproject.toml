@@ -1,0 +1,18 @@
+[project]
+name = "ecomind-sdk"
+version = "0.1.0"
+description = "Python SDK for Ecomind API"
+requires-python = ">=3.10"
+dependencies = [
+    "httpx>=0.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.4",
+    "ruff>=0.1.14",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

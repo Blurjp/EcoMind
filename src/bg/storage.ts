@@ -19,7 +19,17 @@ export class StorageManager {
 
   async getSettings(): Promise<ExtensionSettings> {
     const result = await chrome.storage.local.get(STORAGE_KEYS.SETTINGS);
-    return { ...DEFAULT_SETTINGS, ...result[STORAGE_KEYS.SETTINGS] };
+    const saved = result[STORAGE_KEYS.SETTINGS] || {};
+    
+    // Deep merge to prevent undefined nested properties
+    return {
+      ...DEFAULT_SETTINGS,
+      ...saved,
+      estimationParams: {
+        ...DEFAULT_SETTINGS.estimationParams,
+        ...(saved.estimationParams || {}),
+      },
+    };
   }
 
   async saveSettings(settings: ExtensionSettings): Promise<void> {

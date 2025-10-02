@@ -1,0 +1,39 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - dev
+          - stage
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure kubectl
+        run: |
+          echo "TODO: Configure kubectl with kubeconfig"
+          # kubectl config set-cluster ...
+
+      - name: Deploy with Helm
+        run: |
+          cd infra/helm
+          helm upgrade --install ecomind ./ecomind-chart \
+            --namespace ecomind-${{ github.event.inputs.environment }} \
+            --set image.tag=${{ github.sha }} \
+            --set environment=${{ github.event.inputs.environment }}
+
+      - name: Verify deployment
+        run: |
+          kubectl rollout status deployment/gateway -n ecomind-${{ github.event.inputs.environment }}
+          kubectl rollout status deployment/api -n ecomind-${{ github.event.inputs.environment }}
+          kubectl rollout status deployment/worker -n ecomind-${{ github.event.inputs.environment }}

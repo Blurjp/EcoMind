@@ -3,7 +3,10 @@ import { DEFAULT_SETTINGS, DEFAULT_PROVIDERS } from '@/common/constants';
 import { sendMessage } from './components';
 
 class OptionsManager {
-  private settings: ExtensionSettings = { ...DEFAULT_SETTINGS };
+  private settings: ExtensionSettings = {
+    ...DEFAULT_SETTINGS,
+    estimationParams: { ...DEFAULT_SETTINGS.estimationParams },
+  };
   private elements: { [key: string]: HTMLElement } = {};
 
   constructor() {
@@ -101,7 +104,15 @@ class OptionsManager {
     try {
       const result = await sendMessage('GET_SETTINGS');
       if (result.success && result.data) {
-        this.settings = { ...DEFAULT_SETTINGS, ...result.data };
+        // Deep clone to prevent mutation of DEFAULT_SETTINGS
+        this.settings = {
+          ...DEFAULT_SETTINGS,
+          ...result.data,
+          estimationParams: {
+            ...DEFAULT_SETTINGS.estimationParams,
+            ...(result.data?.estimationParams || {}),
+          },
+        };
         this.populateForm();
         this.renderProviders();
         this.updateConnectionStatus();
@@ -250,9 +261,9 @@ class OptionsManager {
 
     if (!domain) return;
 
-    // Basic domain validation
-    if (!/^(\*\.)?[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(domain)) {
-      alert('Please enter a valid domain (e.g., api.example.com or *.example.com)');
+    // Basic domain validation (allow ports for localhost and custom setups)
+    if (!/^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]+)?(\.[a-zA-Z]{2,}|$)/.test(domain)) {
+      alert('Please enter a valid domain (e.g., api.example.com, *.example.com, or localhost:3000)');
       return;
     }
 
@@ -330,7 +341,10 @@ class OptionsManager {
 
   private async resetToDefaults(): Promise<void> {
     if (confirm('Reset all settings to defaults? This action cannot be undone.')) {
-      this.settings = { ...DEFAULT_SETTINGS };
+      this.settings = {
+        ...DEFAULT_SETTINGS,
+        estimationParams: { ...DEFAULT_SETTINGS.estimationParams },
+      };
       this.populateForm();
       this.renderProviders();
       this.updateConnectionStatus();
