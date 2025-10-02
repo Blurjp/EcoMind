@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "Privacy-first AI sustainability tracker. Calculate carbon footprint, energy, and water usage for OpenAI, Anthropic, and custom APIs.",
   "author": "Ecomind Team",
-  "homepage_url": "https://github.com/ecomind/ecomind-extension",
+  "homepage_url": "https://github.com/Blurjp/EcoMind",
   "permissions": [
     "storage",
     "webRequest",

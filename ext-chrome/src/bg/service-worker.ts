@@ -101,9 +101,8 @@ class ServiceWorker {
         date: getTodayDate(),
       };
 
-      // Store locally
+      // Store locally (addUsageRecord now handles badge update internally)
       await this.storageManager.addUsageRecord(record);
-      await this.storageManager.incrementTodayCount();
 
       // Send telemetry if enabled
       const settings = await this.storageManager.getSettings();

@@ -118,6 +118,16 @@ class PopupManager {
       return;
     }
 
+    // Data source indicator (if using backend data)
+    if (isBackendData) {
+      const sourceIndicator = createElement('div', 'data-source');
+      sourceIndicator.textContent = '☁️ Synced with backend';
+      sourceIndicator.style.fontSize = '0.8em';
+      sourceIndicator.style.color = '#666';
+      sourceIndicator.style.marginBottom = '8px';
+      this.contentEl.appendChild(sourceIndicator);
+    }
+
     // Call count
     const callCountEl = createElement('div', 'call-count', data.callCount.toString());
     this.contentEl.appendChild(callCountEl);

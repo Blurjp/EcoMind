@@ -9,12 +9,42 @@ import { getTodayDate, calculateFootprint } from '@/common/util';
 
 export class StorageManager {
   private static instance: StorageManager;
+  private updateQueue: Promise<void> = Promise.resolve();
+  private inMemoryCache: {
+    dailyUsage: Record<string, DailyUsage> | null;
+    lastFetch: number;
+  } = {
+    dailyUsage: null,
+    lastFetch: 0,
+  };
+  private readonly CACHE_TTL = 1000; // 1 second cache to reduce storage reads
 
   static getInstance(): StorageManager {
     if (!this.instance) {
       this.instance = new StorageManager();
     }
     return this.instance;
+  }
+
+  /**
+   * Serialize all storage update operations to prevent race conditions
+   */
+  private async queueOperation<T>(operation: () => Promise<T>): Promise<T> {
+    const previousOperation = this.updateQueue;
+    let resolver: (value: T) => void;
+    let rejecter: (error: any) => void;
+
+    const currentOperation = new Promise<T>((resolve, reject) => {
+      resolver = resolve;
+      rejecter = reject;
+    });
+
+    this.updateQueue = previousOperation
+      .then(() => operation())
+      .then(resolver!)
+      .catch(rejecter!);
+
+    return currentOperation;
   }
 
   async getSettings(): Promise<ExtensionSettings> {
@@ -47,27 +77,36 @@ export class StorageManager {
   }
 
   async getTodayCount(): Promise<number> {
-    const result = await chrome.storage.local.get(STORAGE_KEYS.TODAY_COUNT);
-    return result[STORAGE_KEYS.TODAY_COUNT] || 0;
+    // Use DailyUsage as single source of truth
+    const today = getTodayDate();
+    const dailyUsage = await this.getDailyUsage();
+    return dailyUsage[today]?.callCount || 0;
   }
 
+  /**
+   * @deprecated Use addUsageRecord() instead - it handles count and badge updates
+   */
   async incrementTodayCount(): Promise<number> {
-    const current = await this.getTodayCount();
-    const newCount = current + 1;
-    await chrome.storage.local.set({
-      [STORAGE_KEYS.TODAY_COUNT]: newCount,
-    });
-    
-    // Update badge
-    await chrome.action.setBadgeText({ text: newCount.toString() });
-    await chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' });
-    
-    return newCount;
+    // This method is deprecated but kept for backward compatibility
+    // The badge is now updated directly in addUsageRecord()
+    return this.getTodayCount();
   }
 
   async getDailyUsage(): Promise<Record<string, DailyUsage>> {
+    // Use in-memory cache to reduce storage reads during bursts
+    const now = Date.now();
+    if (this.inMemoryCache.dailyUsage && now - this.inMemoryCache.lastFetch < this.CACHE_TTL) {
+      return { ...this.inMemoryCache.dailyUsage }; // Return copy to prevent mutations
+    }
+
     const result = await chrome.storage.local.get(STORAGE_KEYS.DAILY_USAGE);
-    return result[STORAGE_KEYS.DAILY_USAGE] || {};
+    const dailyUsage = result[STORAGE_KEYS.DAILY_USAGE] || {};
+
+    // Update cache
+    this.inMemoryCache.dailyUsage = dailyUsage;
+    this.inMemoryCache.lastFetch = now;
+
+    return { ...dailyUsage };
   }
 
   async saveDailyUsage(
@@ -76,6 +115,10 @@ export class StorageManager {
     await chrome.storage.local.set({
       [STORAGE_KEYS.DAILY_USAGE]: dailyUsage,
     });
+
+    // Update cache
+    this.inMemoryCache.dailyUsage = dailyUsage;
+    this.inMemoryCache.lastFetch = Date.now();
   }
 
   async getLastResetDate(): Promise<string> {
@@ -90,45 +133,54 @@ export class StorageManager {
   }
 
   async addUsageRecord(record: UsageRecord): Promise<void> {
-    const dailyUsage = await this.getDailyUsage();
-    const settings = await this.getSettings();
-    
-    if (!dailyUsage[record.date]) {
-      dailyUsage[record.date] = {
-        date: record.date,
-        callCount: 0,
-        totalTokensIn: 0,
-        totalTokensOut: 0,
-        providers: {},
-        models: {},
-        kwh: 0,
-        waterLiters: 0,
-        co2Kg: 0,
-      };
-    }
+    // Queue this operation to prevent race conditions
+    return this.queueOperation(async () => {
+      const dailyUsage = await this.getDailyUsage();
+      const settings = await this.getSettings();
 
-    const dayData = dailyUsage[record.date];
-    dayData.callCount++;
-    dayData.totalTokensIn += record.tokensIn;
-    dayData.totalTokensOut += record.tokensOut;
-    dayData.providers[record.provider] =
-      (dayData.providers[record.provider] || 0) + 1;
-    dayData.models[record.model] = (dayData.models[record.model] || 0) + 1;
+      if (!dailyUsage[record.date]) {
+        dailyUsage[record.date] = {
+          date: record.date,
+          callCount: 0,
+          totalTokensIn: 0,
+          totalTokensOut: 0,
+          providers: {},
+          models: {},
+          kwh: 0,
+          waterLiters: 0,
+          co2Kg: 0,
+        };
+      }
 
-    // Recalculate footprint
-    const footprint = calculateFootprint(
-      dayData.callCount,
-      settings.estimationParams.kwhPerCall,
-      settings.estimationParams.pue,
-      settings.estimationParams.waterLPerKwh,
-      settings.estimationParams.co2KgPerKwh
-    );
-    
-    dayData.kwh = footprint.kwh;
-    dayData.waterLiters = footprint.waterLiters;
-    dayData.co2Kg = footprint.co2Kg;
+      const dayData = dailyUsage[record.date];
+      dayData.callCount++;
+      dayData.totalTokensIn += record.tokensIn;
+      dayData.totalTokensOut += record.tokensOut;
+      dayData.providers[record.provider] =
+        (dayData.providers[record.provider] || 0) + 1;
+      dayData.models[record.model] = (dayData.models[record.model] || 0) + 1;
 
-    await this.saveDailyUsage(dailyUsage);
+      // Recalculate footprint
+      const footprint = calculateFootprint(
+        dayData.callCount,
+        settings.estimationParams.kwhPerCall,
+        settings.estimationParams.pue,
+        settings.estimationParams.waterLPerKwh,
+        settings.estimationParams.co2KgPerKwh
+      );
+
+      dayData.kwh = footprint.kwh;
+      dayData.waterLiters = footprint.waterLiters;
+      dayData.co2Kg = footprint.co2Kg;
+
+      await this.saveDailyUsage(dailyUsage);
+
+      // Update badge with the accurate count (single source of truth)
+      if (record.date === getTodayDate()) {
+        await chrome.action.setBadgeText({ text: dayData.callCount.toString() });
+        await chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' });
+      }
+    });
   }
 
   async getTodayUsage(): Promise<DailyUsage | null> {
