@@ -15,16 +15,16 @@ Chrome Web Store requires **at least 1 screenshot** (maximum 5):
 
 ## Recommended Screenshots (5 total)
 
-### 1. Extension Badge & Popup - Daily Metrics ⭐ PRIMARY
+### 1. Extension Popup - Daily Metrics ⭐ PRIMARY
 **Purpose**: Show the core tracking feature
 
 **Steps to Capture**:
 1. Load extension in Chrome (`chrome://extensions` → Load unpacked → `ext-chrome/dist`)
 2. Visit ChatGPT or Claude and make 3-5 queries
-3. Wait for badge to update (shows count like "5")
+3. Hover over extension icon to verify tooltip shows count (e.g., "EcoMind: 5 calls today")
 4. Click extension icon to open popup
 5. Take screenshot showing:
-   - Browser with extension badge visible
+   - Browser with extension icon visible in toolbar
    - Popup open showing today's metrics
    - Clean browser chrome (no extra tabs)
 
@@ -123,20 +123,20 @@ Chrome Web Store requires **at least 1 screenshot** (maximum 5):
 
 ---
 
-### 5. Extension Badge in Action
+### 5. Extension Tooltip in Action
 **Purpose**: Show real-time tracking during AI usage
 
 **Steps to Capture**:
 1. Open ChatGPT or Claude in a tab
-2. Make sure extension badge shows a count (e.g., "12")
+2. Hover over extension icon to display tooltip with count (e.g., "EcoMind: 12 calls today")
 3. Take screenshot showing:
    - AI service tab (ChatGPT/Claude)
-   - Extension badge with count visible in toolbar
+   - Extension icon with tooltip visible in toolbar
    - Clean browser view
 
 **What Should Be Visible**:
 - AI service website (ChatGPT or Claude interface)
-- Extension icon with badge counter (e.g., "12")
+- Extension icon with tooltip showing call count (e.g., "EcoMind: 12 calls today")
 - Minimal browser chrome (just enough to see extension)
 
 **Screenshot Dimensions**: 1280×800
@@ -214,7 +214,7 @@ chrome.storage.local.set({
     }
   }
 }, () => {
-  chrome.action.setBadgeText({ text: '47' });
+  chrome.action.setTitle({ title: 'EcoMind: 47 calls today' });
   window.location.reload();
 });
 ```
@@ -244,16 +244,16 @@ npm run build
 ```
 - Visit https://chatgpt.com
 - Make 3-5 queries (or inject sample data via console)
-- Badge should show count
+- Hover over extension icon to verify tooltip shows count
 ```
 
 ### 4. Capture Screenshots
 ```
-- Screenshot 1: Popup with badge visible
+- Screenshot 1: Popup with extension icon visible
 - Screenshot 2: Options → Privacy section
 - Screenshot 3: Options → Providers section
 - Screenshot 4: Options → Environment section
-- Screenshot 5: Badge in action
+- Screenshot 5: Tooltip in action (hover over icon to show count)
 ```
 
 ### 5. Save to Directory
@@ -344,11 +344,11 @@ cd screenshots
 - Screenshot 1: Popup dashboard (REQUIRED)
 
 **Recommended Set** (all 5):
-1. Popup with badge visible
+1. Popup with extension icon visible
 2. Options - Privacy settings
 3. Options - Provider tracking
 4. Options - Environmental parameters
-5. Badge in action on AI service
+5. Tooltip in action on AI service (hover to show count)
 
 **Time Estimate**: 15-30 minutes for all 5 screenshots
 
