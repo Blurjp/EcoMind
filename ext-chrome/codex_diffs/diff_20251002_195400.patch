@@ -1,0 +1,27 @@
+--- a/src/bg/storage.ts
++++ b/src/bg/storage.ts
+@@ -177,8 +177,11 @@ export class StorageManager {
+ 
+       // Update badge with the accurate count (single source of truth)
+       if (record.date === getTodayDate()) {
+-        await chrome.action.setBadgeText({ text: dayData.callCount.toString() });
+-        await chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' });
++        // Badge removed to preserve logo visibility
++        // Count is prominently displayed in popup instead
++        await chrome.action.setTitle({
++          title: `Ecomind - ${dayData.callCount} API calls today`
++        });
+       }
+     });
+   }
+@@ -192,7 +195,9 @@ export class StorageManager {
+     await chrome.storage.local.set({
+       [STORAGE_KEYS.TODAY_COUNT]: 0,
+     });
+-    await chrome.action.setBadgeText({ text: '' });
++    await chrome.action.setTitle({
++      title: 'Ecomind - Track AI Environmental Impact'
++    });
+   }
+ 
+   async clearTodayData(): Promise<void> {

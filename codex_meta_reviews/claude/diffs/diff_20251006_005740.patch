@@ -1,0 +1,46 @@
+diff --git a/ext-chrome/tests/domain-validation.test.ts b/ext-chrome/tests/domain-validation.test.ts
+index 1234567..abcdefg 100644
+--- a/ext-chrome/tests/domain-validation.test.ts
++++ b/ext-chrome/tests/domain-validation.test.ts
+@@ -1,6 +1,9 @@
+ describe('Domain Validation', () => {
+   // Test the regex pattern used in options UI
+-  const domainRegex = /^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]+)?(\.[a-zA-Z]{2,}|$)/;
++  // Updated: Prevent trailing dots, double dots, leading/trailing hyphens
++  // Explanation: [a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])? ensures segments start/end with alphanumeric
++  // (\.[...])* allows multiple dot-separated segments, (\.[a-zA-Z]{2,})? allows optional TLD
++  const domainRegex = /^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})?(:[0-9]{1,5})?$/;
+
+   describe('Custom domain validation', () => {
+     it('should accept standard domains', () => {
+diff --git a/ext-chrome/src/ui/options.ts b/ext-chrome/src/ui/options.ts
+index 2345678..bcdefgh 100644
+--- a/ext-chrome/src/ui/options.ts
++++ b/ext-chrome/src/ui/options.ts
+@@ -292,7 +292,10 @@ class OptionsManager {
+
+     // Basic domain validation allowing ports (e.g., localhost:3000, api.example.com:8080)
+     // Allow wildcards (*.example.com), hostnames with optional ports, and TLDs or localhost
+-    if (!/^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]{1,5})?(\.[a-zA-Z]{2,})?$/.test(domain)) {
++    // Prevent trailing dots, double dots, leading/trailing hyphens
++    // Updated regex ensures proper domain structure validation
++    const domainRegex = /^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})?(:[0-9]{1,5})?$/;
++    if (!domainRegex.test(domain)) {
+       alert('Please enter a valid domain (e.g., api.example.com, *.example.com, or localhost:3000)');
+       return;
+     }
+diff --git a/tests/domain-validation.test.ts b/tests/domain-validation.test.ts
+index 3456789..cdefghi 100644
+--- a/tests/domain-validation.test.ts
++++ b/tests/domain-validation.test.ts
+@@ -1,6 +1,9 @@
+ describe('Domain Validation', () => {
+   // Test the regex pattern used in options UI
+-  const domainRegex = /^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]+)?(\.[a-zA-Z]{2,}|$)/;
++  // Updated: Prevent trailing dots, double dots, leading/trailing hyphens
++  // Explanation: [a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])? ensures segments start/end with alphanumeric
++  // (\.[...])* allows multiple dot-separated segments, (\.[a-zA-Z]{2,})? allows optional TLD
++  const domainRegex = /^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})?(:[0-9]{1,5})?$/;
+
+   describe('Custom domain validation', () => {
+     it('should accept standard domains', () => {

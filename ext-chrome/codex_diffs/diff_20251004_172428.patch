@@ -1,0 +1,83 @@
+--- a/.github/workflows/test.yml
++++ b/.github/workflows/test.yml
+@@ -72,3 +72,22 @@ jobs:
+         run: |
+           cd ui
+           npm run build
++
++  test-extension:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: '20'
++      - name: Install deps
++        run: |
++          cd ext-chrome
++          npm ci
++      - name: Run tests with coverage
++        run: |
++          cd ext-chrome
++          npm test -- --coverage
++      - name: Build extension
++        run: |
++          cd ext-chrome
++          npm run build
+--- a/ext-chrome/jest.config.js
++++ b/ext-chrome/jest.config.js
+@@ -7,7 +7,7 @@ module.exports = {
+     '^.+\\.ts$': 'ts-jest',
+   },
+   modulePathIgnorePatterns: ['<rootDir>/dist/'],
+-  moduleNameMapping: {
++  moduleNameMapper: {
+     '^@/(.*)$': '<rootDir>/src/$1',
+   },
+   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
+@@ -18,4 +18,14 @@ module.exports = {
+   ],
+   coverageDirectory: 'coverage',
+   coverageReporters: ['text', 'lcov', 'html'],
++  coverageThreshold: {
++    global: {
++      branches: 90,
++      functions: 90,
++      lines: 90,
++      statements: 90,
++    },
++  },
++  globals: {
++    'ts-jest': { isolatedModules: true },
++  },
+ };
+--- a/ext-chrome/package.json
++++ b/ext-chrome/package.json
+@@ -8,12 +8,14 @@
+     "lint": "eslint src --ext .ts,.js",
+     "lint:fix": "eslint src --ext .ts,.js --fix",
+     "format": "prettier --write src/**/*.{ts,js,css,html}",
+-    "test": "jest"
++    "test": "jest",
++    "test:coverage": "jest --coverage --coverageReporters=text-summary"
+   },
+   "devDependencies": {
+     "@types/chrome": "^0.0.246",
+     "@types/jest": "^29.5.5",
++    "@types/node": "^20.0.0",
+     "@typescript-eslint/eslint-plugin": "^6.7.0",
+     "@typescript-eslint/parser": "^6.7.0",
+     "eslint": "^8.49.0",
+--- a/ext-chrome/tsconfig.json
++++ b/ext-chrome/tsconfig.json
+@@ -16,7 +16,7 @@
+     "paths": {
+       "@/*": ["./*"]
+     },
+-    "types": ["chrome"]
++    "types": ["chrome", "jest", "node"]
+   },
+-  "include": ["src/**/*"],
++  "include": ["src/**/*", "tests/**/*"],
+   "exclude": ["node_modules", "dist"]
+ }

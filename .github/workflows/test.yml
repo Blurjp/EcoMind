@@ -72,3 +72,23 @@ jobs:
         run: |
           cd ui
           npm run build
+
+  test-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: |
+          cd ext-chrome
+          npm ci
+      - name: Run tests
+        run: |
+          cd ext-chrome
+          npm test
+      - name: Build extension
+        run: |
+          cd ext-chrome
+          npm run build
