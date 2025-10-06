@@ -18,7 +18,7 @@
 - [x] Service worker with web request tracking
 - [x] Storage management with race condition fixes
 - [x] Provider detection (OpenAI, Anthropic, Google, etc.)
-- [x] Local tracking with badge counter
+- [x] Local tracking with tooltip counter (hover to see count)
 - [x] Telemetry to backend (HTTP POST)
 - [x] Popup UI with metrics display
 - [x] Options page with settings

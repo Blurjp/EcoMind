@@ -16,8 +16,8 @@
     "paths": {
       "@/*": ["./*"]
     },
-    "types": ["chrome"]
+    "types": ["chrome", "jest", "node"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "tests/**/*"],
   "exclude": ["node_modules", "dist"]
 }

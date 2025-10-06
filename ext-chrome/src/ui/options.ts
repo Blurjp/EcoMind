@@ -292,7 +292,10 @@ class OptionsManager {
 
     // Basic domain validation allowing ports (e.g., localhost:3000, api.example.com:8080)
     // Allow wildcards (*.example.com), hostnames with optional ports, and TLDs or localhost
-    if (!/^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]{1,5})?(\.[a-zA-Z]{2,})?$/.test(domain)) {
+    // Prevent trailing dots, double dots, leading/trailing hyphens
+    // Updated regex ensures proper domain structure validation
+    const domainRegex = /^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})?(:[0-9]{1,5})?$/;
+    if (!domainRegex.test(domain)) {
       alert('Please enter a valid domain (e.g., api.example.com, *.example.com, or localhost:3000)');
       return;
     }

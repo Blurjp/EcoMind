@@ -1,187 +1,270 @@
-# Screenshot Guide for Chrome Web Store
+# Chrome Web Store Screenshot Guide
 
-**Required**: 1-5 screenshots (1280x800 or 640x400 recommended)
-**Format**: PNG or JPEG
-**Purpose**: Show key features and functionality
+**Date**: October 2, 2025
 
 ---
 
-## Screenshot Requirements
+## Requirements
 
-### Chrome Web Store Guidelines
-
-- **Minimum**: 1 screenshot (required)
-- **Recommended**: 3-5 screenshots
-- **Dimensions**: 1280x800, 640x400, or same aspect ratio
-- **Format**: PNG (preferred) or JPEG
-- **File Size**: < 2 MB each
-- **Quality**: High-resolution, clear text, professional appearance
+Chrome Web Store requires **at least 1 screenshot** (maximum 5):
+- **Size**: 1280×800 or 640×400 pixels
+- **Format**: PNG or JPEG
+- **Content**: Show key extension features
 
 ---
 
-## Recommended Screenshots
+## Recommended Screenshots (5 total)
 
-### Screenshot 1: Popup Dashboard (Primary)
-**Priority**: CRITICAL
-**Caption**: "Daily metrics at a glance: API calls, energy consumption, carbon emissions, and water usage"
+### 1. Extension Badge & Popup - Daily Metrics ⭐ PRIMARY
+**Purpose**: Show the core tracking feature
 
-**How to Capture**:
-1. Load extension in Chrome
-2. Click extension icon to open popup
-3. Make sure popup shows default state or simulated data
-4. Use screenshot tool (macOS: Cmd+Shift+4, Windows: Snipping Tool)
-5. Capture entire popup window
-6. Ensure 1280x800 or proportional
+**Steps to Capture**:
+1. Load extension in Chrome (`chrome://extensions` → Load unpacked → `ext-chrome/dist`)
+2. Visit ChatGPT or Claude and make 3-5 queries
+3. Wait for badge to update (shows count like "5")
+4. Click extension icon to open popup
+5. Take screenshot showing:
+   - Browser with extension badge visible
+   - Popup open showing today's metrics
+   - Clean browser chrome (no extra tabs)
 
-**What to Show**:
-- Extension name/title
-- Today's usage metrics (even if zeros)
-- kWh, water, CO₂ display
-- Clear/Settings buttons
-- Clean, professional appearance
+**What Should Be Visible**:
+- 🌱 Ecomind header
+- Today's date (e.g., "Oct 2, 2025")
+- Call count (e.g., "Calls: 5")
+- Energy (e.g., "Energy: 0.005 kWh")
+- CO₂ (e.g., "CO₂: 0.002 kg")
+- Water (e.g., "Water: 0.01 L")
+- Three buttons: Refresh, Options, Clear Today
 
-**Tips**:
-- If showing zeros, add caption: "Clean slate - ready to track your AI usage"
-- Consider using browser dev tools to inject sample data for better visual
-
----
-
-### Screenshot 2: Options Page - General Settings
-**Priority**: HIGH
-**Caption**: "Configure telemetry, privacy mode, and environmental estimation parameters"
-
-**How to Capture**:
-1. Right-click extension icon → Options
-2. Scroll to show General Settings section
-3. Capture showing:
-   - Backend URL field
-   - User ID field
-   - Privacy toggle (local-only mode)
-   - Telemetry toggle
-4. Ensure all labels are readable
-
-**What to Show**:
-- Privacy-first design (local-only mode toggle)
-- Optional telemetry configuration
-- User-friendly form layout
-- Clear labeling
+**Screenshot Dimensions**: 1280×800
+**Filename**: `screenshot-1-popup.png`
+**Caption for Store**: "Real-time AI usage tracking with environmental impact metrics"
 
 ---
 
-### Screenshot 3: Options Page - Estimation Parameters
-**Priority**: MEDIUM
-**Caption**: "Customize environmental impact calculations with industry-standard or custom parameters"
+### 2. Options Page - Privacy Settings ⭐ PRIVACY FOCUS
+**Purpose**: Highlight privacy-first design
 
-**How to Capture**:
-1. Scroll to Estimation Parameters section in options
-2. Capture showing:
-   - kWh per call input
-   - PUE (Power Usage Effectiveness) input
-   - Water L/kWh input
-   - CO₂ kg/kWh input
-3. Show default values filled in
+**Steps to Capture**:
+1. Click "Options" button in popup (or right-click extension icon → Options)
+2. Options page opens in new tab
+3. Scroll to show these sections together:
+   - 🌐 Backend Configuration
+   - 🔒 Privacy Settings
+4. Take screenshot of options page
 
-**What to Show**:
-- Customizable parameters
-- Scientific metrics (kWh, PUE, L, kg CO₂)
-- Professional environmental tracking
+**What Should Be Visible**:
+- "🌱 Ecomind Settings" header
+- Backend URL field (empty or example: `https://api.example.com`)
+- User ID field
+- "Local-only mode" checkbox
+- "Enable telemetry" checkbox
+- Help text: "When enabled, all data stays on your device..."
+- Privacy warning (if local mode is ON)
 
----
-
-### Screenshot 4: Options Page - Custom Providers
-**Priority**: MEDIUM
-**Caption**: "Add custom AI provider domains to track internal or specialized APIs"
-
-**How to Capture**:
-1. Scroll to Custom Providers section
-2. Ideally, add 1-2 sample custom providers first:
-   - `api.custom.com`
-   - `internal-ai.example.com`
-3. Capture showing:
-   - Default providers list (OpenAI, Anthropic, etc.)
-   - Custom providers section
-   - Add domain input field
-   - Remove button for custom providers
-
-**What to Show**:
-- Extensibility (custom providers)
-- Built-in provider support
-- Easy management (add/remove)
+**Screenshot Dimensions**: 1280×800
+**Filename**: `screenshot-2-privacy.png`
+**Caption for Store**: "Privacy-first: Local-only mode keeps all data on your device"
 
 ---
 
-### Screenshot 5: Privacy Mode Demonstration (Optional)
-**Priority**: LOW
-**Caption**: "Local-only mode keeps all data on your device - nothing sent to servers"
+### 3. Options Page - Provider Tracking
+**Purpose**: Show supported providers + custom domain feature
 
-**How to Capture**:
-1. Options page with privacy toggle ON
-2. Show warning/info message about local-only mode
-3. Highlight disabled telemetry fields
+**Steps to Capture**:
+1. Stay on Options page
+2. Scroll to "🎯 Tracking Providers" section
+3. (Optional) Add 1-2 custom providers for demo:
+   - Enter `api.custom-ai.com` → Click Add
+   - Enter `internal.example.com` → Click Add
+4. Take screenshot showing providers section
 
-**What to Show**:
-- Privacy focus
-- Clear visual feedback
-- User control over data
+**What Should Be Visible**:
+- Default providers with checkboxes:
+  - OpenAI (api.openai.com)
+  - Anthropic (api.anthropic.com)
+  - Google (generativelanguage.googleapis.com)
+  - Perplexity, Mistral, etc.
+- Custom Providers section
+- Input field: "api.custom-ai.com"
+- "Add" button
+- Listed custom providers (if you added any)
+
+**Screenshot Dimensions**: 1280×800
+**Filename**: `screenshot-3-providers.png`
+**Caption for Store**: "Track OpenAI, Anthropic, Google AI, and custom domains"
 
 ---
 
-## Creating Sample Data (Optional)
+### 4. Options Page - Environmental Parameters
+**Purpose**: Show customizable estimation settings
 
-If you want screenshots with realistic data instead of zeros, use Chrome DevTools:
+**Steps to Capture**:
+1. Scroll to "🌍 Environmental Estimation" section
+2. Make sure all parameter fields show default values:
+   - kWh per API call: 0.001
+   - Power Usage Effectiveness (PUE): 1.2
+   - Water (L per kWh): 0.4
+   - CO₂ (kg per kWh): 0.5
+3. Take screenshot of this section
 
-### Inject Sample Data into Popup
+**What Should Be Visible**:
+- Section title: "🌍 Environmental Estimation"
+- Description text
+- Four input fields with labels and values
+- Help text under each field
+- "Reset to Defaults" button
+- "Save Settings" button (optionally with "✓ Saved" indicator)
+
+**Screenshot Dimensions**: 1280×800
+**Filename**: `screenshot-4-environment.png`
+**Caption for Store**: "Customize environmental impact calculations with industry-standard parameters"
+
+---
+
+### 5. Extension Badge in Action
+**Purpose**: Show real-time tracking during AI usage
+
+**Steps to Capture**:
+1. Open ChatGPT or Claude in a tab
+2. Make sure extension badge shows a count (e.g., "12")
+3. Take screenshot showing:
+   - AI service tab (ChatGPT/Claude)
+   - Extension badge with count visible in toolbar
+   - Clean browser view
+
+**What Should Be Visible**:
+- AI service website (ChatGPT or Claude interface)
+- Extension icon with badge counter (e.g., "12")
+- Minimal browser chrome (just enough to see extension)
+
+**Screenshot Dimensions**: 1280×800
+**Filename**: `screenshot-5-tracking.png`
+**Caption for Store**: "Automatically tracks API calls to AI services in real-time"
+
+---
+
+## How to Take Screenshots
+
+### macOS (Recommended)
+```bash
+# Press Cmd+Shift+4
+# Click and drag to select area
+# File saves to Desktop as "Screenshot YYYY-MM-DD at HH.MM.SS.png"
+```
+
+### Windows
+```bash
+# Press Win+Shift+S (Snipping Tool)
+# Select area
+# Save as PNG
+```
+
+### Linux
+```bash
+gnome-screenshot -a  # Area screenshot
+# Or use Spectacle, Flameshot, etc.
+```
+
+---
+
+## Resize Screenshots (if needed)
+
+### macOS Preview
+1. Open screenshot in Preview
+2. Tools → Adjust Size
+3. Set Width: 1280, Height: 800
+4. Uncheck "Scale proportionally"
+5. Save
+
+### ImageMagick (all platforms)
+```bash
+brew install imagemagick  # macOS
+# or apt install imagemagick (Linux)
+
+convert screenshot.png -resize 1280x800! screenshot-resized.png
+```
+
+---
+
+## Create Sample Data (Optional)
+
+If you want realistic numbers instead of zeros, inject sample data:
+
+### Open Extension Popup Console
+1. Click extension icon to open popup
+2. Right-click popup → Inspect
+3. Go to Console tab
+4. Paste this code:
 
 ```javascript
-// Open popup, then in DevTools console:
+const today = new Date().toISOString().split('T')[0];
 chrome.storage.local.set({
-  'today-2025-01-01': {
-    count: 127,
-    totalKwh: 0.508,
-    totalWaterL: 2.032,
-    totalCo2Kg: 0.254
+  ecomind_daily_usage: {
+    [today]: {
+      callCount: 47,
+      totalKwh: 0.047,
+      totalWaterL: 0.019,
+      totalCo2Kg: 0.024,
+      providers: {
+        openai: { count: 28, models: { 'gpt-4': 28 } },
+        anthropic: { count: 19, models: { 'claude-3-5-sonnet': 19 } }
+      }
+    }
   }
 }, () => {
-  // Reload popup to show data
+  chrome.action.setBadgeText({ text: '47' });
   window.location.reload();
 });
 ```
 
-Then capture the popup with realistic numbers.
+5. Popup will reload with sample data
+6. Take screenshot
 
 ---
 
 ## Screenshot Preparation Workflow
 
-### Step 1: Set Up Extension
+### 1. Build Extension
 ```bash
 cd /Users/jianphua/projects/EcoMind/ext-chrome
 npm run build
-# Load dist/ in Chrome as unpacked extension
 ```
 
-### Step 2: Open Extension
-- Click extension icon (popup)
-- Right-click → Options (options page)
-
-### Step 3: Capture Screenshots
-- macOS: `Cmd + Shift + 4` → Drag to select area
-- Windows: Snipping Tool or `Win + Shift + S`
-- Linux: `gnome-screenshot -a` or Screenshot tool
-
-### Step 4: Resize/Optimize (if needed)
-- Use Preview (macOS), Paint (Windows), or GIMP (all platforms)
-- Target dimensions: 1280x800 or 640x400
-- Save as PNG
-- Verify file size < 2 MB
-
-### Step 5: Name Files
+### 2. Load in Chrome
 ```
-screenshot-1-popup-dashboard.png
-screenshot-2-options-general.png
-screenshot-3-options-parameters.png
-screenshot-4-options-providers.png
-screenshot-5-privacy-mode.png
+1. Open chrome://extensions
+2. Enable "Developer mode"
+3. Click "Load unpacked"
+4. Select /Users/jianphua/projects/EcoMind/ext-chrome/dist
+```
+
+### 3. Generate Usage Data
+```
+- Visit https://chatgpt.com
+- Make 3-5 queries (or inject sample data via console)
+- Badge should show count
+```
+
+### 4. Capture Screenshots
+```
+- Screenshot 1: Popup with badge visible
+- Screenshot 2: Options → Privacy section
+- Screenshot 3: Options → Providers section
+- Screenshot 4: Options → Environment section
+- Screenshot 5: Badge in action
+```
+
+### 5. Save to Directory
+```bash
+mkdir -p screenshots
+mv ~/Desktop/Screenshot*.png screenshots/
+cd screenshots
+# Rename files:
+mv Screenshot1.png screenshot-1-popup.png
+mv Screenshot2.png screenshot-2-privacy.png
+# etc.
 ```
 
 ---
@@ -190,121 +273,86 @@ screenshot-5-privacy-mode.png
 
 Before uploading to Chrome Web Store:
 
-- [ ] All screenshots are 1280x800 or 640x400 (or same aspect ratio)
+- [ ] All screenshots are 1280×800 (or 640×400 minimum)
 - [ ] PNG format (preferred over JPEG)
 - [ ] File sizes under 2 MB each
 - [ ] Text is readable and clear
 - [ ] No personal/sensitive information visible
-- [ ] No browser chrome/toolbars (just extension UI)
 - [ ] Professional appearance (no errors, broken layouts)
-- [ ] Captions prepared for each screenshot
-- [ ] At least 1 screenshot (recommended 3-5)
-
----
-
-## Alternative: Use Mockups
-
-If you prefer polished marketing screenshots:
-
-1. **Design Tool**: Figma, Sketch, or Canva
-2. **Template**: Chrome extension screenshot template
-3. **Add**: Extension screenshots + marketing text
-4. **Export**: 1280x800 PNG
-
-This is optional - actual screenshots are perfectly acceptable.
+- [ ] Captions prepared for each screenshot:
+  - Screenshot 1: "Real-time AI usage tracking with environmental impact metrics"
+  - Screenshot 2: "Privacy-first: Local-only mode keeps all data on your device"
+  - Screenshot 3: "Track OpenAI, Anthropic, Google AI, and custom domains"
+  - Screenshot 4: "Customize environmental impact calculations with industry-standard parameters"
+  - Screenshot 5: "Automatically tracks API calls to AI services in real-time"
+- [ ] At least 1 screenshot captured (recommended 5)
 
 ---
 
 ## Tips for Great Screenshots
 
-1. **Clean Background**: Plain white or light gray
+1. **Clean Background**: Plain browser interface
 2. **Readable Text**: Ensure all labels/numbers are clear
 3. **Highlight Features**: Show key functionality
 4. **Consistent Style**: Use same zoom level/window size
-5. **No Clutter**: Hide unnecessary browser elements
+5. **No Clutter**: Hide unnecessary browser elements (bookmarks bar, extra tabs)
 6. **Professional**: No debug info, console errors, or test data
 
 ---
 
 ## What NOT to Include
 
-- ❌ Browser address bar or tabs (unless necessary)
 - ❌ Personal information or email addresses
 - ❌ Console errors or debug messages
 - ❌ Unfinished features or placeholder text
-- ❌ Copyrighted content (e.g., actual AI prompts from services)
+- ❌ Copyrighted content (actual AI conversation content)
 - ❌ Low-resolution or blurry images
 
 ---
 
-## After Screenshots Are Ready
+## Where to Save
 
-1. **Upload to Chrome Web Store Developer Console**:
-   - Go to Store Listing → Graphic Assets
-   - Upload each screenshot
-   - Add captions
-   - Reorder if needed (drag and drop)
-
-2. **Preview**:
-   - Check how screenshots appear in store listing
-   - Verify captions display correctly
-   - Test on different screen sizes
-
-3. **Iterate**:
-   - If screenshots don't convey value, retake
-   - Get feedback from team/users
-   - Update before final submission
+```bash
+mkdir -p /Users/jianphua/projects/EcoMind/ext-chrome/screenshots
+cd screenshots
+# Save files as:
+# - screenshot-1-popup.png
+# - screenshot-2-privacy.png
+# - screenshot-3-providers.png
+# - screenshot-4-environment.png
+# - screenshot-5-tracking.png
+```
 
 ---
 
-## Example Caption Templates
+## Upload to Chrome Web Store
 
-Use these or customize:
-
-**Popup**:
-- "Monitor your AI usage: calls, energy, water, and carbon footprint"
-- "Real-time environmental impact tracking"
-- "See your daily AI sustainability metrics at a glance"
-
-**Options - General**:
-- "Privacy-first design with local-only mode"
-- "Choose between local tracking or team telemetry"
-- "Configure backend integration (optional)"
-
-**Options - Parameters**:
-- "Customize environmental calculations"
-- "Industry-standard metrics with full control"
-- "Adjust kWh, PUE, water, and CO₂ factors"
-
-**Options - Providers**:
-- "Track OpenAI, Anthropic, Google AI, and more"
-- "Add custom domains for internal APIs"
-- "Extensible provider support"
-
-**Privacy Mode**:
-- "Your data stays on your device"
-- "No external tracking by default"
-- "Full transparency and control"
+1. Go to [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+2. Create new item or edit existing
+3. Under "Store listing" → "Graphic assets" → Screenshots:
+   - Click "Choose file"
+   - Upload PNG files (up to 5)
+   - Add captions from checklist above
+   - Drag to reorder (first screenshot shows prominently)
+4. Save draft
 
 ---
 
 ## Quick Reference
 
-**Minimum Viable Screenshots**:
-1. Popup dashboard (REQUIRED)
-2. Options page general view (RECOMMENDED)
-3. Custom providers section (RECOMMENDED)
+**Minimum Viable**:
+- Screenshot 1: Popup dashboard (REQUIRED)
 
-**Ideal Set**:
-1. Popup with data
-2. Options - General settings
-3. Options - Estimation parameters
-4. Options - Custom providers
-5. Privacy mode highlight
+**Recommended Set** (all 5):
+1. Popup with badge visible
+2. Options - Privacy settings
+3. Options - Provider tracking
+4. Options - Environmental parameters
+5. Badge in action on AI service
 
-**Time Estimate**: 30-60 minutes for all screenshots
+**Time Estimate**: 15-30 minutes for all 5 screenshots
 
 ---
 
 **Status**: Ready to capture screenshots
-**Next Action**: Load extension in Chrome and follow capture guide above
+**Next Action**: Follow "Screenshot Preparation Workflow" above to capture all 5 screenshots

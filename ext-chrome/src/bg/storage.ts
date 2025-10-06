@@ -175,10 +175,9 @@ export class StorageManager {
 
       await this.saveDailyUsage(dailyUsage);
 
-      // Update badge with the accurate count (single source of truth)
+      // Update tooltip with the accurate count (single source of truth)
       if (record.date === getTodayDate()) {
-        await chrome.action.setBadgeText({ text: dayData.callCount.toString() });
-        await chrome.action.setBadgeBackgroundColor({ color: '#4CAF50' });
+        await chrome.action.setTitle({ title: `EcoMind: ${dayData.callCount} calls today` });
       }
     });
   }
@@ -193,7 +192,7 @@ export class StorageManager {
     await chrome.storage.local.set({
       [STORAGE_KEYS.TODAY_COUNT]: 0,
     });
-    await chrome.action.setBadgeText({ text: '' });
+    await chrome.action.setTitle({ title: 'EcoMind: 0 calls today' });
   }
 
   async clearTodayData(): Promise<void> {

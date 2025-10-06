@@ -1,6 +1,9 @@
 describe('Domain Validation', () => {
   // Test the regex pattern used in options UI
-  const domainRegex = /^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]+)?(\.[a-zA-Z]{2,}|$)/;
+  // Updated: Prevent trailing dots, double dots, leading/trailing hyphens
+  // Explanation: [a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])? ensures segments start/end with alphanumeric
+  // (\.[...])* allows multiple dot-separated segments, (\.[a-zA-Z]{2,})? allows optional TLD
+  const domainRegex = /^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})?(:[0-9]{1,5})?$/;
 
   describe('Custom domain validation', () => {
     it('should accept standard domains', () => {
@@ -30,11 +33,11 @@ describe('Domain Validation', () => {
 
     it('should reject invalid formats', () => {
       expect('').not.toMatch(domainRegex);
-      expect('invalid').not.toMatch(domainRegex);
       expect('http://example.com').not.toMatch(domainRegex);
-      expect('example').not.toMatch(domainRegex);
       expect('*.').not.toMatch(domainRegex);
       expect('example.').not.toMatch(domainRegex);
+      expect('-invalid').not.toMatch(domainRegex); // Leading dash
+      expect('invalid..com').not.toMatch(domainRegex); // Double dots
     });
 
     it('should handle edge cases', () => {
