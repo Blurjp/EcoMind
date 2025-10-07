@@ -19,6 +19,19 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     name: 'openai',
     domains: ['api.openai.com', 'chatgpt.com', 'chat.openai.com'],
     modelExtractor: (url: string, body?: string) => {
+      // Try URL extraction for ChatGPT web UI
+      if (url.includes('chatgpt.com')) {
+        // ChatGPT web UI uses /backend-api/conversation endpoint
+        if (url.includes('/backend-api/conversation')) {
+          return 'chatgpt-web';
+        }
+        // GPT-4 model selector in URL params
+        const modelMatch = url.match(/[?&]model=([^&]+)/);
+        if (modelMatch) {
+          return decodeURIComponent(modelMatch[1]);
+        }
+      }
+
       if (body) {
         try {
           const parsed = JSON.parse(body);
@@ -32,8 +45,21 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
   },
   {
     name: 'anthropic',
-    domains: ['api.anthropic.com'],
+    domains: ['api.anthropic.com', 'claude.ai'],
     modelExtractor: (url: string, body?: string) => {
+      // Try URL extraction for Claude web UI
+      if (url.includes('claude.ai')) {
+        // Claude web UI organization URLs sometimes include model hints
+        const modelMatch = url.match(/[?&]model=([^&]+)/);
+        if (modelMatch) {
+          return decodeURIComponent(modelMatch[1]);
+        }
+        // Generic indicator for Claude web interface
+        if (url.includes('/api/organizations/')) {
+          return 'claude-web';
+        }
+      }
+
       if (body) {
         try {
           const parsed = JSON.parse(body);
@@ -111,8 +137,8 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
           // Ignore parsing errors
         }
       }
-      // Fall back to URL extraction
-      const match = url.match(/\/models\/([^\/\?]+)/);
+      // Fall back to URL extraction (works well for Gemini)
+      const match = url.match(/\/models\/([^\/\?:]+)/);
       return match ? match[1] : 'unknown';
     },
   },

@@ -173,6 +173,10 @@ class PopupManager {
         .map(([model, count]) => ({
           label: model === 'unknown' ? 'Unknown' : model,
           value: count.toString(),
+          // Add tooltip for unknown models explaining MV3 limitation
+          title: model === 'unknown'
+            ? 'Model detection limited in Chrome MV3 - provider identified but specific model name unavailable from API requests'
+            : undefined,
         }));
 
       const modelsList = createList(modelsData);

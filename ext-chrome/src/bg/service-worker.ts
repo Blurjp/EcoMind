@@ -13,6 +13,7 @@ class ServiceWorker {
   private timeManager: TimeManager;
   private initialized = false;
   private readonly boundHandleWebRequest = this.handleWebRequest.bind(this);
+  private readonly boundHandleHeaders = this.handleResponseHeaders.bind(this);
   private readonly boundHandleAlarm = this.handleAlarm.bind(this);
 
   constructor() {
@@ -57,6 +58,27 @@ class ServiceWorker {
         ['requestBody']
       );
     }
+
+    // Also listen to response headers for model extraction
+    // Some providers include model info in response headers
+    if (chrome.webRequest && chrome.webRequest.onHeadersReceived) {
+      chrome.webRequest.onHeadersReceived.removeListener(this.boundHandleHeaders);
+      chrome.webRequest.onHeadersReceived.addListener(
+        this.boundHandleHeaders,
+        {
+          urls: ['<all_urls>'],
+          types: ['xmlhttprequest'],
+        },
+        ['responseHeaders']
+      );
+    }
+  }
+
+  private async handleResponseHeaders(
+    details: chrome.webRequest.WebResponseHeadersDetails
+  ): Promise<void> {
+    // Placeholder for future enhancement: extract model from response headers
+    // This would require correlating requests/responses by requestId
   }
 
   private setupAlarmListener(): void {

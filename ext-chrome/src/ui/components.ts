@@ -36,11 +36,16 @@ export function createDataRow(label: string, value: string): HTMLElement {
 }
 
 export function createList(
-  items: Array<{ label: string; value: string }>
+  items: Array<{ label: string; value: string; title?: string }>
 ): HTMLElement {
   const list = createElement('div', 'data-list');
   items.forEach((item) => {
-    list.appendChild(createDataRow(item.label, item.value));
+    const row = createDataRow(item.label, item.value);
+    if (item.title) {
+      row.setAttribute('title', item.title);
+      row.style.cursor = 'help';
+    }
+    list.appendChild(row);
   });
   return list;
 }

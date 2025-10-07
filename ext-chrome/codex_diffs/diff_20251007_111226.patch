@@ -1,0 +1,134 @@
+diff --git a/ext-chrome/src/bg/service-worker.ts b/ext-chrome/src/bg/service-worker.ts
+index abc123..def456 100644
+--- a/ext-chrome/src/bg/service-worker.ts
++++ b/ext-chrome/src/bg/service-worker.ts
+@@ -13,6 +13,7 @@ class ServiceWorker {
+   private timeManager: TimeManager;
+   private initialized = false;
+   private readonly boundHandleWebRequest = this.boundHandleWebRequest.bind(this);
++  private readonly boundHandleHeaders = this.handleResponseHeaders.bind(this);
+   private readonly boundHandleAlarm = this.handleAlarm.bind(this);
+
+   constructor() {
+@@ -48,12 +49,31 @@ class ServiceWorker {
+   private setupWebRequestListener(): void {
+     if (chrome.webRequest && chrome.webRequest.onBeforeRequest) {
+       chrome.webRequest.onBeforeRequest.removeListener(this.boundHandleWebRequest);
+       chrome.webRequest.onBeforeRequest.addListener(
+         this.boundHandleWebRequest,
+         {
+           urls: ['<all_urls>'],
+           types: ['xmlhttprequest'],
+         },
+         ['requestBody']
+       );
+     }
++
++    // Also listen to response headers for model extraction
++    // Some providers include model info in response headers
++    if (chrome.webRequest && chrome.webRequest.onHeadersReceived) {
++      chrome.webRequest.onHeadersReceived.removeListener(this.boundHandleHeaders);
++      chrome.webRequest.onHeadersReceived.addListener(
++        this.boundHandleHeaders,
++        {
++          urls: ['<all_urls>'],
++          types: ['xmlhttprequest'],
++        },
++        ['responseHeaders']
++      );
++    }
++  }
++
++  private async handleResponseHeaders(
++    details: chrome.webRequest.WebResponseHeadersDetails
++  ): Promise<void> {
++    // Placeholder for future enhancement: extract model from response headers
++    // This would require correlating requests/responses by requestId
+   }
+
+   private setupAlarmListener(): void {
+diff --git a/ext-chrome/src/common/constants.ts b/ext-chrome/src/common/constants.ts
+index abc456..def789 100644
+--- a/ext-chrome/src/common/constants.ts
++++ b/ext-chrome/src/common/constants.ts
+@@ -19,6 +19,18 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+     name: 'openai',
+     domains: ['api.openai.com', 'chatgpt.com', 'chat.openai.com'],
+     modelExtractor: (url: string, body?: string) => {
++      // Try URL extraction for ChatGPT web UI
++      if (url.includes('chatgpt.com')) {
++        // ChatGPT web UI uses /backend-api/conversation endpoint
++        if (url.includes('/backend-api/conversation')) {
++          return 'chatgpt-web';
++        }
++        // GPT-4 model selector in URL params
++        const modelMatch = url.match(/[?&]model=([^&]+)/);
++        if (modelMatch) {
++          return decodeURIComponent(modelMatch[1]);
++        }
++      }
++
+       if (body) {
+         try {
+           const parsed = JSON.parse(body);
+@@ -33,6 +45,18 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+   {
+     name: 'anthropic',
+     domains: ['api.anthropic.com'],
+     modelExtractor: (url: string, body?: string) => {
++      // Try URL extraction for Claude web UI
++      if (url.includes('claude.ai')) {
++        // Claude web UI organization URLs sometimes include model hints
++        const modelMatch = url.match(/[?&]model=([^&]+)/);
++        if (modelMatch) {
++          return decodeURIComponent(modelMatch[1]);
++        }
++        // Generic indicator for Claude web interface
++        if (url.includes('/api/organizations/')) {
++          return 'claude-web';
++        }
++      }
++
+       if (body) {
+         try {
+           const parsed = JSON.parse(body);
+@@ -103,10 +127,15 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+     name: 'google',
+     domains: ['generativelanguage.googleapis.com', 'ai.google.dev'],
+     modelExtractor: (url: string, body?: string) => {
+       // Try body first if available
+       if (body) {
+         try {
+           const parsed = JSON.parse(body);
+           if (parsed.model) return parsed.model;
+         } catch {
+           // Ignore parsing errors
+         }
+       }
+-      // Fall back to URL extraction
++      // Fall back to URL extraction (works well for Gemini)
+       const match = url.match(/\/models\/([^\/\?:]+)/);
+       return match ? match[1] : 'unknown';
+     },
+diff --git a/ext-chrome/src/ui/popup.ts b/ext-chrome/src/ui/popup.ts
+index xyz123..uvw456 100644
+--- a/ext-chrome/src/ui/popup.ts
++++ b/ext-chrome/src/ui/popup.ts
+@@ -171,7 +171,7 @@ class PopupManager {
+         .map((model) => ({
+           label: model === 'unknown' ? 'Unknown' : model,
+           value: usage.models[model],
+         }))
+         .sort((a, b) => b.value - a.value)
+         .slice(0, 5);
+
+       modelsList.innerHTML = topModels
+-        .map((m) => `<div class="stat-item"><span>${m.label}</span><span>${m.value}</span></div>`)
++        .map((m) => {
++          const tooltip = m.label === 'Unknown'
++            ? ' title="Model detection limited in Chrome MV3 - provider identified but specific model name unavailable from API requests"'
++            : '';
++          return `<div class="stat-item"${tooltip}><span>${m.label}</span><span>${m.value}</span></div>`;
++        })
+         .join('');
+     }
