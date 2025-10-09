@@ -1,5 +1,7 @@
 # 🌱 Ecomind – Enterprise AI Environmental Monitoring Platform
 
+> **Status**: Development - No CI/CD pipeline configured yet
+
 **Centralized, multi-tenant monitoring for AI/compute usage with energy, water, and CO₂ footprint tracking.**
 
 ## Overview
