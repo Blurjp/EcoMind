@@ -24,7 +24,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'openai-api';
         } catch {
           // Ignore parsing errors
         }
@@ -45,7 +45,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'anthropic-api';
         } catch {
           // Ignore parsing errors
         }
