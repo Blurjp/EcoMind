@@ -26,21 +26,28 @@ export function createSection(title: string): HTMLElement {
   return section;
 }
 
-export function createDataRow(label: string, value: string): HTMLElement {
+export function createDataRow(
+  label: string,
+  value: string,
+  title?: string
+): HTMLElement {
   const row = createElement('div', 'data-row');
   const labelEl = createElement('span', 'data-label', label);
   const valueEl = createElement('span', 'data-value', value);
   row.appendChild(labelEl);
   row.appendChild(valueEl);
+  if (title) {
+    labelEl.title = title;
+  }
   return row;
 }
 
 export function createList(
-  items: Array<{ label: string; value: string }>
+  items: Array<{ label: string; value: string; title?: string }>
 ): HTMLElement {
   const list = createElement('div', 'data-list');
   items.forEach((item) => {
-    list.appendChild(createDataRow(item.label, item.value));
+    list.appendChild(createDataRow(item.label, item.value, item.title));
   });
   return list;
 }

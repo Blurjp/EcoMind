@@ -163,6 +163,10 @@ class PopupManager {
         .map(([model, count]) => ({
           label: model === 'unknown' ? 'Unknown' : model,
           value: count.toString(),
+          title:
+            model === 'unknown'
+              ? 'Chrome MV3 restricts request body access - provider detected but model name unavailable'
+              : undefined,
         }));
 
       const modelsList = createList(modelsData);
