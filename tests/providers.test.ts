@@ -36,35 +36,35 @@ describe('ProviderManager', () => {
         expect(result.model).toBe('gpt-4');
       });
 
-      it('should detect chatgpt-web from chatgpt.com URL (lowercase)', () => {
+      it('should detect chatgpt from chatgpt.com URL (lowercase)', () => {
         const result = providerManager.extractModel('https://chatgpt.com/backend-api/conversation', undefined);
 
         expect(result.provider).toBe('openai');
-        expect(result.model).toBe('chatgpt-web');
+        expect(result.model).toBe('chatgpt');
       });
 
-      it('should detect chatgpt-web from chatgpt.com URL (mixed case)', () => {
+      it('should detect chatgpt from chatgpt.com URL (mixed case)', () => {
         const result = providerManager.extractModel('https://ChatGPT.com/backend-api/conversation', undefined);
 
         expect(result.provider).toBe('openai');
-        expect(result.model).toBe('chatgpt-web');
+        expect(result.model).toBe('chatgpt');
       });
 
-      it('should detect chatgpt-web from www.chatgpt.com subdomain', () => {
+      it('should detect chatgpt from www.chatgpt.com subdomain', () => {
         const result = providerManager.extractModel('https://www.chatgpt.com/api', undefined);
 
         expect(result.provider).toBe('openai');
-        expect(result.model).toBe('chatgpt-web');
+        expect(result.model).toBe('chatgpt');
       });
 
-      it('should detect chatgpt-web from chat.openai.com', () => {
+      it('should detect chatgpt from chat.openai.com', () => {
         const result = providerManager.extractModel('https://chat.openai.com/backend-api/conversation', undefined);
 
         expect(result.provider).toBe('openai');
-        expect(result.model).toBe('chatgpt-web');
+        expect(result.model).toBe('chatgpt');
       });
 
-      it('should NOT detect chatgpt-web from fake domains', () => {
+      it('should NOT detect chatgpt from fake domains', () => {
         const result = providerManager.extractModel('https://fakechatgpt.com/api', undefined);
 
         expect(result.provider).toBe('unknown');
@@ -89,21 +89,21 @@ describe('ProviderManager', () => {
         expect(result.model).toBe('claude-3-sonnet-20240229');
       });
 
-      it('should detect claude-web from claude.ai URL', () => {
+      it('should detect claude from claude.ai URL', () => {
         const result = providerManager.extractModel('https://claude.ai/chat/new', undefined);
 
         expect(result.provider).toBe('anthropic');
-        expect(result.model).toBe('claude-web');
+        expect(result.model).toBe('claude');
       });
 
-      it('should detect claude-web from claude.ai (mixed case)', () => {
+      it('should detect claude from claude.ai (mixed case)', () => {
         const result = providerManager.extractModel('https://Claude.AI/api', undefined);
 
         expect(result.provider).toBe('anthropic');
-        expect(result.model).toBe('claude-web');
+        expect(result.model).toBe('claude');
       });
 
-      it('should NOT detect claude-web from fake domains', () => {
+      it('should NOT detect claude from fake domains', () => {
         const result = providerManager.extractModel('https://fakeclaude.ai/api', undefined);
 
         expect(result.provider).toBe('unknown');

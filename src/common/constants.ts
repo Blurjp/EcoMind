@@ -31,7 +31,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       }
       // MV3 fallback: URL-based detection when body unavailable
       if (matchesDomain(url, 'chatgpt.com') || matchesDomain(url, 'chat.openai.com')) {
-        return 'chatgpt-web';
+        return 'chatgpt';
       }
       // Final fallback: OpenAI API (body empty, not web UI)
       return 'openai-api';
@@ -52,7 +52,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       }
       // MV3 fallback: URL-based detection when body unavailable
       if (matchesDomain(url, 'claude.ai')) {
-        return 'claude-web';
+        return 'claude';
       }
       // Final fallback: Anthropic API (body empty, not web UI)
       return 'anthropic-api';
