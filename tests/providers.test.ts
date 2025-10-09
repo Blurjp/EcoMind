@@ -27,20 +27,88 @@ describe('ProviderManager', () => {
   });
 
   describe('extractModel', () => {
-    it('should extract model from OpenAI request', () => {
-      const body = JSON.stringify({ model: 'gpt-4', messages: [] });
-      const result = providerManager.extractModel('https://api.openai.com/v1/chat', body);
-      
-      expect(result.provider).toBe('openai');
-      expect(result.model).toBe('gpt-4');
+    describe('OpenAI', () => {
+      it('should extract model from API request body', () => {
+        const body = JSON.stringify({ model: 'gpt-4', messages: [] });
+        const result = providerManager.extractModel('https://api.openai.com/v1/chat', body);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('gpt-4');
+      });
+
+      it('should detect chatgpt-web from chatgpt.com URL (lowercase)', () => {
+        const result = providerManager.extractModel('https://chatgpt.com/backend-api/conversation', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt-web');
+      });
+
+      it('should detect chatgpt-web from chatgpt.com URL (mixed case)', () => {
+        const result = providerManager.extractModel('https://ChatGPT.com/backend-api/conversation', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt-web');
+      });
+
+      it('should detect chatgpt-web from www.chatgpt.com subdomain', () => {
+        const result = providerManager.extractModel('https://www.chatgpt.com/api', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt-web');
+      });
+
+      it('should detect chatgpt-web from chat.openai.com', () => {
+        const result = providerManager.extractModel('https://chat.openai.com/backend-api/conversation', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt-web');
+      });
+
+      it('should NOT detect chatgpt-web from fake domains', () => {
+        const result = providerManager.extractModel('https://fakechatgpt.com/api', undefined);
+
+        expect(result.provider).toBe('unknown');
+        expect(result.model).toBe('unknown');
+      });
+
+      it('should prefer body model over URL fallback', () => {
+        const body = JSON.stringify({ model: 'gpt-4-turbo', messages: [] });
+        const result = providerManager.extractModel('https://chatgpt.com/api', body);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('gpt-4-turbo'); // Body wins
+      });
     });
 
-    it('should extract model from Anthropic request', () => {
-      const body = JSON.stringify({ model: 'claude-3-sonnet-20240229', messages: [] });
-      const result = providerManager.extractModel('https://api.anthropic.com/v1/messages', body);
-      
-      expect(result.provider).toBe('anthropic');
-      expect(result.model).toBe('claude-3-sonnet-20240229');
+    describe('Anthropic', () => {
+      it('should extract model from API request body', () => {
+        const body = JSON.stringify({ model: 'claude-3-sonnet-20240229', messages: [] });
+        const result = providerManager.extractModel('https://api.anthropic.com/v1/messages', body);
+
+        expect(result.provider).toBe('anthropic');
+        expect(result.model).toBe('claude-3-sonnet-20240229');
+      });
+
+      it('should detect claude-web from claude.ai URL', () => {
+        const result = providerManager.extractModel('https://claude.ai/chat/new', undefined);
+
+        expect(result.provider).toBe('anthropic');
+        expect(result.model).toBe('claude-web');
+      });
+
+      it('should detect claude-web from claude.ai (mixed case)', () => {
+        const result = providerManager.extractModel('https://Claude.AI/api', undefined);
+
+        expect(result.provider).toBe('anthropic');
+        expect(result.model).toBe('claude-web');
+      });
+
+      it('should NOT detect claude-web from fake domains', () => {
+        const result = providerManager.extractModel('https://fakeclaude.ai/api', undefined);
+
+        expect(result.provider).toBe('unknown');
+        expect(result.model).toBe('unknown');
+      });
     });
 
     it('should extract model from Replicate URL', () => {

@@ -1,4 +1,5 @@
 import { ExtensionSettings, ProviderConfig } from './types';
+import { matchesDomain } from './util';
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
   baseUrl: '',
@@ -17,7 +18,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
 export const DEFAULT_PROVIDERS: ProviderConfig[] = [
   {
     name: 'openai',
-    domains: ['api.openai.com', 'chatgpt.com', 'chat.openai.com'],
+    domains: ['api.openai.com', 'chatgpt.com', '*.chatgpt.com', 'chat.openai.com', '*.chat.openai.com'],
     modelExtractor: (url: string, body?: string) => {
       // Try body parsing first (preserves accuracy when body available)
       if (body) {
@@ -29,7 +30,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
         }
       }
       // MV3 fallback: URL-based detection when body unavailable
-      if (url.includes('chatgpt.com') || url.includes('chat.openai.com')) {
+      if (matchesDomain(url, 'chatgpt.com') || matchesDomain(url, 'chat.openai.com')) {
         return 'chatgpt-web';
       }
       return 'unknown';
@@ -37,7 +38,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
   },
   {
     name: 'anthropic',
-    domains: ['api.anthropic.com', 'claude.ai'],
+    domains: ['api.anthropic.com', 'claude.ai', '*.claude.ai'],
     modelExtractor: (url: string, body?: string) => {
       // Try body parsing first (preserves accuracy when body available)
       if (body) {
@@ -49,7 +50,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
         }
       }
       // MV3 fallback: URL-based detection when body unavailable
-      if (url.includes('claude.ai')) {
+      if (matchesDomain(url, 'claude.ai')) {
         return 'claude-web';
       }
       return 'unknown';

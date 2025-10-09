@@ -1,3 +1,14 @@
+export function matchesDomain(url: string, domain: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+    // Match exact domain or subdomain
+    return hostname === domain || hostname.endsWith('.' + domain);
+  } catch {
+    return false; // Invalid URL
+  }
+}
+
 export function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
 }

@@ -1,0 +1,44 @@
+--- a/src/common/util.ts
++++ b/src/common/util.ts
+@@ -1,3 +1,14 @@
++export function matchesDomain(url: string, domain: string): boolean {
++  try {
++    const urlObj = new URL(url);
++    const hostname = urlObj.hostname.toLowerCase();
++    // Match exact domain or subdomain
++    return hostname === domain || hostname.endsWith('.' + domain);
++  } catch {
++    return false; // Invalid URL
++  }
++}
++
+ export function getTodayDate(): string {
+   const now = new Date();
+   return now.toISOString().split('T')[0];
+
+--- a/src/common/constants.ts
++++ b/src/common/constants.ts
+@@ -1,4 +1,5 @@
+ import { ExtensionSettings, ProviderConfig } from './types';
++import { matchesDomain } from './util';
+
+ export const DEFAULT_SETTINGS: ExtensionSettings = {
+   baseUrl: '',
+@@ -29,7 +30,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+         }
+       }
+       // MV3 fallback: URL-based detection when body unavailable
+-      if (url.includes('chatgpt.com') || url.includes('chat.openai.com')) {
++      if (matchesDomain(url, 'chatgpt.com') || matchesDomain(url, 'chat.openai.com')) {
+         return 'chatgpt-web';
+       }
+       return 'unknown';
+@@ -50,7 +51,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+         }
+       }
+       // MV3 fallback: URL-based detection when body unavailable
+-      if (url.includes('claude.ai')) {
++      if (matchesDomain(url, 'claude.ai')) {
+         return 'claude-web';
+       }
+       return 'unknown';

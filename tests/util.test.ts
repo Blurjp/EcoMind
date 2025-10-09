@@ -1,4 +1,5 @@
 import {
+  matchesDomain,
   getTodayDate,
   generateId,
   isValidUrl,
@@ -10,6 +11,58 @@ import {
 } from '../src/common/util';
 
 describe('Utility Functions', () => {
+  describe('matchesDomain', () => {
+    it('should match exact domain (lowercase)', () => {
+      expect(matchesDomain('https://chatgpt.com/api', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('https://claude.ai/chat', 'claude.ai')).toBe(true);
+    });
+
+    it('should match exact domain (mixed case)', () => {
+      expect(matchesDomain('https://ChatGPT.com/api', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('https://CHATGPT.COM/api', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('https://Claude.AI/chat', 'claude.ai')).toBe(true);
+    });
+
+    it('should match subdomains', () => {
+      expect(matchesDomain('https://www.chatgpt.com/api', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('https://api.chatgpt.com/v1', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('https://subdomain.claude.ai/chat', 'claude.ai')).toBe(true);
+    });
+
+    it('should reject fake domains', () => {
+      expect(matchesDomain('https://fakechatgpt.com', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('https://notchatgpt.com', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('https://mychatgpt.com', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('https://chatgpt.com.example.com', 'chatgpt.com')).toBe(false);
+    });
+
+    it('should reject query param tricks', () => {
+      expect(matchesDomain('https://evil.com?url=chatgpt.com', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('https://phishing.net?redirect=claude.ai', 'claude.ai')).toBe(false);
+    });
+
+    it('should reject subdomain attacks', () => {
+      expect(matchesDomain('https://chatgpt.com.evil.net', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('https://claude.ai.phishing.com', 'claude.ai')).toBe(false);
+    });
+
+    it('should handle invalid URLs', () => {
+      expect(matchesDomain('not-a-url', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('', 'chatgpt.com')).toBe(false);
+      expect(matchesDomain('javascript:alert(1)', 'chatgpt.com')).toBe(false);
+    });
+
+    it('should handle URLs with ports', () => {
+      expect(matchesDomain('https://chatgpt.com:443/api', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('http://localhost:3000', 'localhost')).toBe(true);
+    });
+
+    it('should handle URLs with paths and fragments', () => {
+      expect(matchesDomain('https://chatgpt.com/backend-api/conversation', 'chatgpt.com')).toBe(true);
+      expect(matchesDomain('https://claude.ai/chat/new#model', 'claude.ai')).toBe(true);
+    });
+  });
+
   describe('getTodayDate', () => {
     it('should return date in YYYY-MM-DD format', () => {
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
