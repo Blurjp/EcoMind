@@ -381,22 +381,15 @@ Stripe integration:
 - [ ] Carbon credit purchase integration
 - [ ] Team-level budgets and quotas
 
-## Contributing
-
-1. Fork repo
-2. Create feature branch
-3. Run `make lint` and `make test`
-4. Submit PR with tests
-
 ## License
 
-MIT License – See [LICENSE](LICENSE)
+Proprietary – All rights reserved
 
 ## Support
 
-- GitHub Issues: [github.com/ecomind/ecomind](https://github.com/ecomind/ecomind)
-- Docs: [docs.ecomind.example.com](https://docs.ecomind.example.com)
-- Slack: [ecomind.slack.com](https://ecomind.slack.com)
+For support inquiries, please contact:
+- Email: support@ecomind.ai
+- Website: https://ecomind.ai
 
 ---
 
