@@ -2,6 +2,7 @@ from app.models.org import Org, PlanType
 from app.models.user import User, Role
 from app.models.event import EventEnriched
 from app.models.aggregate import DailyOrgAgg, DailyUserAgg, DailyProviderAgg, DailyModelAgg
+from app.models.audit import AuditLog
 
 __all__ = [
     "Org",
@@ -13,4 +14,5 @@ __all__ = [
     "DailyUserAgg",
     "DailyProviderAgg",
     "DailyModelAgg",
+    "AuditLog",
 ]

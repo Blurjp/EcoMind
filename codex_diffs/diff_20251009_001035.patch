@@ -1,0 +1,52 @@
+--- a/src/ui/components.ts
++++ b/src/ui/components.ts
+@@ -26,12 +26,18 @@ export function createSection(title: string): HTMLElement {
+   return section;
+ }
+
+-export function createDataRow(label: string, value: string): HTMLElement {
++export function createDataRow(
++  label: string,
++  value: string,
++  title?: string
++): HTMLElement {
+   const row = createElement('div', 'data-row');
+   const labelEl = createElement('span', 'data-label', label);
+   const valueEl = createElement('span', 'data-value', value);
+   row.appendChild(labelEl);
+   row.appendChild(valueEl);
++  if (title) {
++    labelEl.title = title;
++  }
+   return row;
+ }
+
+@@ -38,8 +44,8 @@ export function createDataRow(label: string, value: string): HTMLElement {
+ }
+
+ export function createList(
+-  items: Array<{ label: string; value: string }>
++  items: Array<{ label: string; value: string; title?: string }>
+ ): HTMLElement {
+   const list = createElement('div', 'data-list');
+   items.forEach((item) => {
+-    list.appendChild(createDataRow(item.label, item.value));
++    list.appendChild(createDataRow(item.label, item.value, item.title));
+   });
+   return list;
+ }
+--- a/src/ui/popup.ts
++++ b/src/ui/popup.ts
+@@ -161,7 +161,11 @@ class PopupManager {
+       .sort(([, a], [, b]) => b - a)
+       .slice(0, 5)
+       .map(([model, count]) => ({
+         label: model === 'unknown' ? 'Unknown' : model,
+         value: count.toString(),
++        title:
++          model === 'unknown'
++            ? 'Chrome MV3 restricts request body access - provider detected but model name unavailable'
++            : undefined,
+       }));
+
+       const modelsList = createList(modelsData);

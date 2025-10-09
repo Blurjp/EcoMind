@@ -1,0 +1,52 @@
+EcoMind Database Migrations
+============================
+
+This directory contains Alembic database migration scripts for the EcoMind platform.
+
+## Quick Start
+
+### Development
+```bash
+# Run migrations
+export DATABASE_URL="postgresql://ecomind:ecomind_dev_pass@localhost:5432/ecomind"
+alembic upgrade head
+
+# Create a new migration
+alembic revision --autogenerate -m "description of changes"
+
+# Rollback one migration
+alembic downgrade -1
+```
+
+### Production
+See docs/deployment/migrations.md for production deployment procedures.
+
+## Important Notes
+
+1. **Existing Databases**: If migrating an existing database, use the baselining
+   procedure documented in scripts/baseline_database.sh
+
+2. **Secret Management**: Never commit DATABASE_URL with credentials.
+   Use environment variables or AWS Secrets Manager.
+
+3. **Testing**: Always test migrations on a database snapshot before
+   applying to production.
+
+## Migration Workflow
+
+1. Make changes to SQLAlchemy models in app/models/
+2. Generate migration: `alembic revision --autogenerate -m "description"`
+3. Review generated migration in alembic/versions/
+4. Test: `alembic upgrade head` on dev database
+5. Test rollback: `alembic downgrade -1`
+6. Commit migration file to git
+7. Deploy via CI/CD pipeline
+
+## Directory Structure
+
+- versions/          - Migration scripts (auto-generated + manual)
+- env.py            - Alembic environment configuration
+- script.py.mako    - Template for new migrations
+- README            - This file
+
+For more information: https://alembic.sqlalchemy.org/

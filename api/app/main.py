@@ -4,7 +4,7 @@ from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes import health, ingest, query, orgs, users, audits, alerts, reports
+from app.routes import health, ingest, query, orgs, users, audits, alerts, reports, auth
 
 
 @asynccontextmanager
@@ -33,6 +33,7 @@ app.add_middleware(
 
 # Routes
 app.include_router(health.router)
+app.include_router(auth.router)  # Authentication routes (Phase 2)
 app.include_router(ingest.router, prefix="/v1")
 app.include_router(query.router, prefix="/v1")
 app.include_router(orgs.router, prefix="/v1")

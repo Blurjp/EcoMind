@@ -21,5 +21,6 @@ class User(Base):
     org_id = Column(String, ForeignKey("orgs.id"), nullable=False)
     email = Column(String, unique=True, nullable=False)
     name = Column(String)
+    password_hash = Column(String, nullable=True)  # Added in migration 002
     role = Column(SQLEnum(Role), default=Role.VIEWER)
     created_at = Column(DateTime, default=datetime.utcnow)

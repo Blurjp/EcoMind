@@ -1,3 +1,10 @@
+"""
+Query routes for EcoMind API
+
+SECURITY (Phase 2):
+All routes now require authentication and check organization access.
+"""
+
 from datetime import datetime, date
 from typing import Optional
 
@@ -7,6 +14,8 @@ from sqlalchemy import func
 
 from app.db import get_db
 from app.models import DailyOrgAgg, DailyUserAgg, DailyProviderAgg, DailyModelAgg
+from app.models.user import User, Role
+from app.auth import get_current_user, require_same_org
 
 router = APIRouter()
 
@@ -16,8 +25,39 @@ async def get_today(
     org_id: str = Query(..., description="Organization ID"),
     user_id: Optional[str] = Query(None, description="User ID (optional)"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """Get today's aggregated usage"""
+    """
+    Get today's aggregated usage.
+
+    Security:
+    - Requires valid JWT token
+    - User must belong to the requested organization
+    - VIEWER role can only see own data (unless querying org-wide)
+    - ANALYST+ can see org-wide data
+    """
+    # Check organization access
+    await require_same_org(org_id, current_user)
+
+    # RBAC: VIEWERs can only see their own data
+    if user_id and current_user.role == Role.VIEWER:
+        if user_id != current_user.id:
+            from fastapi import HTTPException, status
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Viewers can only access their own data"
+            )
+
+    # RBAC: VIEWERs cannot access org-wide data
+    if not user_id:
+        from app.auth import can_access_resource
+        if not can_access_resource(current_user, "read_org_data"):
+            from fastapi import HTTPException, status
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions to access organization-wide data"
+            )
+
     today = date.today()
 
     if user_id:
@@ -126,8 +166,27 @@ async def get_daily_aggregate(
     to_date: str = Query(..., alias="to"),
     group_by: str = Query("provider", regex="^(provider|model|user)$"),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """Get daily aggregates with grouping"""
+    """
+    Get daily aggregates with grouping.
+
+    Security:
+    - Requires valid JWT token
+    - User must belong to the requested organization
+    - Requires "read_org_data" permission (ANALYST, ADMIN, OWNER, or BILLING)
+    """
+    # Check organization access
+    await require_same_org(org_id, current_user)
+
+    # Check permission (requires ANALYST or higher)
+    from app.auth import can_access_resource
+    if not can_access_resource(current_user, "read_org_data"):
+        from fastapi import HTTPException, status
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Insufficient permissions. Requires ANALYST role or higher."
+        )
     from_dt = date.fromisoformat(from_date)
     to_dt = date.fromisoformat(to_date)
 

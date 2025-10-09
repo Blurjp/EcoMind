@@ -23,7 +23,7 @@ class EventEnriched(Base):
     co2_kg = Column(Float, nullable=False)
     ts = Column(DateTime, nullable=False, index=True)
     source = Column(String)
-    metadata = Column(JSON)
+    event_metadata = Column('metadata', JSON)  # Renamed to avoid SQLAlchemy reserved word
     created_at = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
