@@ -19,6 +19,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     name: 'openai',
     domains: ['api.openai.com', 'chatgpt.com', 'chat.openai.com'],
     modelExtractor: (url: string, body?: string) => {
+      // Try body parsing first (preserves accuracy when body available)
       if (body) {
         try {
           const parsed = JSON.parse(body);
@@ -27,13 +28,18 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
           // Ignore parsing errors
         }
       }
+      // MV3 fallback: URL-based detection when body unavailable
+      if (url.includes('chatgpt.com') || url.includes('chat.openai.com')) {
+        return 'chatgpt-web';
+      }
       return 'unknown';
     },
   },
   {
     name: 'anthropic',
-    domains: ['api.anthropic.com'],
+    domains: ['api.anthropic.com', 'claude.ai'],
     modelExtractor: (url: string, body?: string) => {
+      // Try body parsing first (preserves accuracy when body available)
       if (body) {
         try {
           const parsed = JSON.parse(body);
@@ -41,6 +47,10 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
         } catch {
           // Ignore parsing errors
         }
+      }
+      // MV3 fallback: URL-based detection when body unavailable
+      if (url.includes('claude.ai')) {
+        return 'claude-web';
       }
       return 'unknown';
     },
