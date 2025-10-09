@@ -410,17 +410,38 @@ status, feedback = codex.review(proposal)
 
 ## Recommendation
 
-**Keep Both!** They serve different purposes:
+### ⭐ **PRIMARY: Use codex_review_loop.py for Daily Development**
 
-1. **orchestrator.py** - For planned feature development
-   - Use when: Implementing P001, P002, P003 phases
-   - Benefit: Manages entire multi-phase workflow
+**Why**: You're using Claude Code interactively with slash commands. codex_review_loop.py is designed specifically for this workflow.
 
-2. **codex_review_loop.py** - For interactive fixes
-   - Use when: Running /auto-review or /show-me-the-code
-   - Benefit: Quick, targeted reviews with user control
+**Use for**:
+- ✅ `/auto-review` - bug fixes and targeted changes
+- ✅ `/show-me-the-code` - investigations and proposals
+- ✅ Interactive development with real-time feedback
+- ✅ User confirms before applying changes
+
+**Benefits**:
+- ✅ Safer (no auto-apply)
+- ✅ Simpler (stateless)
+- ✅ Better conversation history
+- ✅ Works with any code change
+
+### SECONDARY: Keep orchestrator.py for Automation
+
+**Use when**:
+- Automated CI/CD pipelines (GitHub Actions, Jenkins)
+- Batch processing multiple phases unattended
+- Quarterly feature planning that runs overnight
+
+**Not recommended for**: Daily interactive development
+
+### Code Reuse Opportunity
 
 **Consider**: Extract shared Codex client code into `.claude/libs/codex_client.py` to reduce duplication.
+
+### Official Workflow Documentation
+
+See [RECOMMENDED_WORKFLOW.md](.claude/RECOMMENDED_WORKFLOW.md) for complete guidance on using codex_review_loop.py.
 
 ---
 
