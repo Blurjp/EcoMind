@@ -33,7 +33,8 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (matchesDomain(url, 'chatgpt.com') || matchesDomain(url, 'chat.openai.com')) {
         return 'chatgpt-web';
       }
-      return 'unknown';
+      // Final fallback: OpenAI API (body empty, not web UI)
+      return 'openai-api';
     },
   },
   {
@@ -53,7 +54,8 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (matchesDomain(url, 'claude.ai')) {
         return 'claude-web';
       }
-      return 'unknown';
+      // Final fallback: Anthropic API (body empty, not web UI)
+      return 'anthropic-api';
     },
   },
   {
@@ -61,7 +63,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     domains: ['api.replicate.com'],
     modelExtractor: (url: string) => {
       const match = url.match(/\/models\/([^\/]+\/[^\/]+)/);
-      return match ? match[1] : 'unknown';
+      return match ? match[1] : 'replicate-api';
     },
   },
   {
@@ -71,12 +73,12 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'together-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      return 'together-api';
     },
   },
   {
@@ -86,12 +88,12 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'cohere-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      return 'cohere-api';
     },
   },
   {
@@ -101,12 +103,12 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'perplexity-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      return 'perplexity-api';
     },
   },
   {
@@ -124,7 +126,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       }
       // Fall back to URL extraction
       const match = url.match(/\/models\/([^\/\?]+)/);
-      return match ? match[1] : 'unknown';
+      return match ? match[1] : 'google-api';
     },
   },
 ];

@@ -118,11 +118,11 @@ describe('ProviderManager', () => {
       expect(result.model).toBe('meta/llama-2-70b-chat');
     });
 
-    it('should return unknown for invalid JSON body', () => {
+    it('should return openai-api for invalid JSON body', () => {
       const result = providerManager.extractModel('https://api.openai.com/v1/chat', 'invalid json');
-      
+
       expect(result.provider).toBe('openai');
-      expect(result.model).toBe('unknown');
+      expect(result.model).toBe('openai-api');
     });
 
     it('should return unknown for unknown provider', () => {
