@@ -118,16 +118,6 @@ class PopupManager {
       return;
     }
 
-    // Data source indicator (if using backend data)
-    if (isBackendData) {
-      const sourceIndicator = createElement('div', 'data-source');
-      sourceIndicator.textContent = '☁️ Synced with backend';
-      sourceIndicator.style.fontSize = '0.8em';
-      sourceIndicator.style.color = '#666';
-      sourceIndicator.style.marginBottom = '8px';
-      this.contentEl.appendChild(sourceIndicator);
-    }
-
     // Call count
     const callCountEl = createElement('div', 'call-count', data.callCount.toString());
     this.contentEl.appendChild(callCountEl);
@@ -173,10 +163,10 @@ class PopupManager {
         .map(([model, count]) => ({
           label: model === 'unknown' ? 'Unknown' : model,
           value: count.toString(),
-          // Add tooltip for unknown models explaining MV3 limitation
-          title: model === 'unknown'
-            ? 'Model detection limited in Chrome MV3 - provider identified but specific model name unavailable from API requests'
-            : undefined,
+          title:
+            model === 'unknown'
+              ? 'Chrome MV3 restricts request body access - provider detected but model name unavailable'
+              : undefined,
         }));
 
       const modelsList = createList(modelsData);

@@ -27,34 +27,168 @@ describe('ProviderManager', () => {
   });
 
   describe('extractModel', () => {
-    it('should extract model from OpenAI request', () => {
-      const body = JSON.stringify({ model: 'gpt-4', messages: [] });
-      const result = providerManager.extractModel('https://api.openai.com/v1/chat', body);
-      
-      expect(result.provider).toBe('openai');
-      expect(result.model).toBe('gpt-4');
+    describe('OpenAI', () => {
+      it('should extract model from API request body', () => {
+        const body = JSON.stringify({ model: 'gpt-4', messages: [] });
+        const result = providerManager.extractModel('https://api.openai.com/v1/chat', body);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('gpt-4');
+      });
+
+      it('should detect chatgpt from chatgpt.com URL (lowercase)', () => {
+        const result = providerManager.extractModel('https://chatgpt.com/backend-api/conversation', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt');
+      });
+
+      it('should detect chatgpt from chatgpt.com URL (mixed case)', () => {
+        const result = providerManager.extractModel('https://ChatGPT.com/backend-api/conversation', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt');
+      });
+
+      it('should detect chatgpt from www.chatgpt.com subdomain', () => {
+        const result = providerManager.extractModel('https://www.chatgpt.com/api', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt');
+      });
+
+      it('should detect chatgpt from chat.openai.com', () => {
+        const result = providerManager.extractModel('https://chat.openai.com/backend-api/conversation', undefined);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('chatgpt');
+      });
+
+      it('should NOT detect chatgpt from fake domains', () => {
+        const result = providerManager.extractModel('https://fakechatgpt.com/api', undefined);
+
+        expect(result.provider).toBe('unknown');
+        expect(result.model).toBe('unknown');
+      });
+
+      it('should prefer body model over URL fallback', () => {
+        const body = JSON.stringify({ model: 'gpt-4-turbo', messages: [] });
+        const result = providerManager.extractModel('https://chatgpt.com/api', body);
+
+        expect(result.provider).toBe('openai');
+        expect(result.model).toBe('gpt-4-turbo'); // Body wins
+      });
     });
 
-    it('should extract model from Anthropic request', () => {
-      const body = JSON.stringify({ model: 'claude-3-sonnet-20240229', messages: [] });
-      const result = providerManager.extractModel('https://api.anthropic.com/v1/messages', body);
-      
-      expect(result.provider).toBe('anthropic');
-      expect(result.model).toBe('claude-3-sonnet-20240229');
+    describe('Anthropic', () => {
+      it('should extract model from API request body', () => {
+        const body = JSON.stringify({ model: 'claude-3-sonnet-20240229', messages: [] });
+        const result = providerManager.extractModel('https://api.anthropic.com/v1/messages', body);
+
+        expect(result.provider).toBe('anthropic');
+        expect(result.model).toBe('claude-3-sonnet-20240229');
+      });
+
+      it('should detect claude from claude.ai URL', () => {
+        const result = providerManager.extractModel('https://claude.ai/chat/new', undefined);
+
+        expect(result.provider).toBe('anthropic');
+        expect(result.model).toBe('claude');
+      });
+
+      it('should detect claude from claude.ai (mixed case)', () => {
+        const result = providerManager.extractModel('https://Claude.AI/api', undefined);
+
+        expect(result.provider).toBe('anthropic');
+        expect(result.model).toBe('claude');
+      });
+
+      it('should NOT detect claude from fake domains', () => {
+        const result = providerManager.extractModel('https://fakeclaude.ai/api', undefined);
+
+        expect(result.provider).toBe('unknown');
+        expect(result.model).toBe('unknown');
+      });
     });
 
     it('should extract model from Replicate URL', () => {
       const result = providerManager.extractModel('https://api.replicate.com/v1/models/meta/llama-2-70b-chat/predictions');
-      
+
       expect(result.provider).toBe('replicate');
       expect(result.model).toBe('meta/llama-2-70b-chat');
     });
 
-    it('should return unknown for invalid JSON body', () => {
+    describe('HuggingFace', () => {
+      it('should extract full owner/model from HuggingFace URL', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('mistralai/Mixtral-8x7B-Instruct-v0.1');
+      });
+
+      it('should extract owner/model with hyphens and underscores', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('meta-llama/Llama-2-7b');
+      });
+
+      it('should handle query parameters correctly', () => {
+        const result = providerManager.extractModel('https://huggingface.co/models/facebook/bart-large?query=test');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('facebook/bart-large');
+      });
+
+      it('should handle trailing slashes', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/google/flan-t5-base/');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('google/flan-t5-base');
+      });
+
+      it('should extract model from body if URL has no model path', () => {
+        const body = JSON.stringify({ model: 'my-custom-model' });
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/inference', body);
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('my-custom-model');
+      });
+
+      it('should extract single-segment model IDs', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/gpt2');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('gpt2');
+      });
+
+      it('should stop at additional path segments', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/meta/llama-2-70b/predict');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('meta/llama-2-70b');
+      });
+
+      it('should fall back to huggingface-api when no model in URL or body', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/health');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('huggingface-api');
+      });
+
+      it('should handle complex model names with versions', () => {
+        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0');
+
+        expect(result.provider).toBe('huggingface');
+        expect(result.model).toBe('stabilityai/stable-diffusion-xl-base-1.0');
+      });
+    });
+
+    it('should return openai-api for invalid JSON body', () => {
       const result = providerManager.extractModel('https://api.openai.com/v1/chat', 'invalid json');
-      
+
       expect(result.provider).toBe('openai');
-      expect(result.model).toBe('unknown');
+      expect(result.model).toBe('openai-api');
     });
 
     it('should return unknown for unknown provider', () => {

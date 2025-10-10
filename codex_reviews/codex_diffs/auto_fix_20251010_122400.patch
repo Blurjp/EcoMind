@@ -1,0 +1,42 @@
+diff --git a/src/common/constants.ts b/src/common/constants.ts
+index previous..current 100644
+--- a/src/common/constants.ts
++++ b/src/common/constants.ts
+@@ -167,8 +167,8 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+     modelExtractor: (url: string, body?: string) => {
+       // Try to extract model from URL path
+-      // HuggingFace uses owner/model format (e.g., mistralai/Mixtral-8x7B-Instruct-v0.1)
+-      // Match exactly 2 segments; falls back to body parsing for edge cases
+-      const match = url.match(/\/models\/([^\/]+\/[^\/\?]+)/);
++      // HuggingFace supports both single-segment (e.g., distilbert-base-uncased) and owner/model (e.g., mistralai/Mixtral-8x7B-Instruct-v0.1)
++      // Capture 1-2 path segments after /models/, stopping at query params or additional path segments
++      const match = url.match(/\/models\/([^\/\?]+(?:\/[^\/\?]+)?)/);
+       if (match) return match[1];
+ 
+       // Try body parsing
+
+diff --git a/tests/providers.test.ts b/tests/providers.test.ts
+index previous..current 100644
+--- a/tests/providers.test.ts
++++ b/tests/providers.test.ts
+@@ -156,11 +156,18 @@ describe('ProviderManager', () => {
+         expect(result.model).toBe('my-custom-model');
+       });
+ 
+-      it('should fall back to huggingface-api for single-segment models', () => {
++      it('should extract single-segment model IDs', () => {
+         const result = providerManager.extractModel('https://api-inference.huggingface.co/models/gpt2');
+ 
+         expect(result.provider).toBe('huggingface');
+-        expect(result.model).toBe('huggingface-api');
++        expect(result.model).toBe('gpt2');
++      });
++
++      it('should stop at additional path segments', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/meta/llama-2-70b/predict');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('meta/llama-2-70b');
+       });
+ 
+       it('should fall back to huggingface-api when no model in URL or body', () => {

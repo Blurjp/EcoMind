@@ -35,3 +35,15 @@ coverage/
 # Chrome extension packages
 *.crx
 *.pem
+# ============================================
+# CHROME EXTENSION SOURCE PROTECTION
+# ============================================
+# Extension source is ONLY in ext-chrome/
+# DO NOT create these in project root:
+/src/
+/tests/
+/dist/
+/manifest.json
+/vite.config.ts
+/jest.config.js
+# Use ext-chrome/ instead!

@@ -3,24 +3,11 @@ import { DEFAULT_SETTINGS, DEFAULT_PROVIDERS } from '@/common/constants';
 import { sendMessage } from './components';
 
 class OptionsManager {
-  private settings: ExtensionSettings = this.cloneDefaultSettings();
+  private settings: ExtensionSettings = {
+    ...DEFAULT_SETTINGS,
+    estimationParams: { ...DEFAULT_SETTINGS.estimationParams },
+  };
   private elements: { [key: string]: HTMLElement } = {};
-
-  private cloneDefaultSettings(): ExtensionSettings {
-    return {
-      baseUrl: DEFAULT_SETTINGS.baseUrl,
-      userId: DEFAULT_SETTINGS.userId,
-      telemetryEnabled: DEFAULT_SETTINGS.telemetryEnabled,
-      privacyLocalOnly: DEFAULT_SETTINGS.privacyLocalOnly,
-      customProviders: [...DEFAULT_SETTINGS.customProviders],
-      estimationParams: {
-        kwhPerCall: DEFAULT_SETTINGS.estimationParams.kwhPerCall,
-        pue: DEFAULT_SETTINGS.estimationParams.pue,
-        waterLPerKwh: DEFAULT_SETTINGS.estimationParams.waterLPerKwh,
-        co2KgPerKwh: DEFAULT_SETTINGS.estimationParams.co2KgPerKwh,
-      },
-    };
-  }
 
   constructor() {
     this.initializeElements();
@@ -118,20 +105,12 @@ class OptionsManager {
       const result = await sendMessage('GET_SETTINGS');
       if (result.success && result.data) {
         // Deep clone to prevent mutation of DEFAULT_SETTINGS
-        const data = result.data;
         this.settings = {
-          baseUrl: data.baseUrl ?? DEFAULT_SETTINGS.baseUrl,
-          userId: data.userId ?? DEFAULT_SETTINGS.userId,
-          telemetryEnabled: data.telemetryEnabled ?? DEFAULT_SETTINGS.telemetryEnabled,
-          privacyLocalOnly: data.privacyLocalOnly ?? DEFAULT_SETTINGS.privacyLocalOnly,
-          customProviders: Array.isArray(data.customProviders)
-            ? [...data.customProviders]
-            : [...DEFAULT_SETTINGS.customProviders],
+          ...DEFAULT_SETTINGS,
+          ...result.data,
           estimationParams: {
-            kwhPerCall: data.estimationParams?.kwhPerCall ?? DEFAULT_SETTINGS.estimationParams.kwhPerCall,
-            pue: data.estimationParams?.pue ?? DEFAULT_SETTINGS.estimationParams.pue,
-            waterLPerKwh: data.estimationParams?.waterLPerKwh ?? DEFAULT_SETTINGS.estimationParams.waterLPerKwh,
-            co2KgPerKwh: data.estimationParams?.co2KgPerKwh ?? DEFAULT_SETTINGS.estimationParams.co2KgPerKwh,
+            ...DEFAULT_SETTINGS.estimationParams,
+            ...(result.data?.estimationParams || {}),
           },
         };
         this.populateForm();
@@ -229,26 +208,18 @@ class OptionsManager {
     this.settings.privacyLocalOnly = (this.elements.privacyLocalOnly as HTMLInputElement).checked;
     this.settings.telemetryEnabled = (this.elements.telemetryEnabled as HTMLInputElement).checked;
 
-    // Use Number.isFinite to allow legitimate zero values
-    const kwhValue = parseFloat((this.elements.kwhPerCall as HTMLInputElement).value);
-    this.settings.estimationParams.kwhPerCall = Number.isFinite(kwhValue)
-      ? kwhValue
-      : DEFAULT_SETTINGS.estimationParams.kwhPerCall;
-
-    const pueValue = parseFloat((this.elements.pue as HTMLInputElement).value);
-    this.settings.estimationParams.pue = Number.isFinite(pueValue)
-      ? pueValue
-      : DEFAULT_SETTINGS.estimationParams.pue;
-
-    const waterValue = parseFloat((this.elements.waterLPerKwh as HTMLInputElement).value);
-    this.settings.estimationParams.waterLPerKwh = Number.isFinite(waterValue)
-      ? waterValue
-      : DEFAULT_SETTINGS.estimationParams.waterLPerKwh;
-
-    const co2Value = parseFloat((this.elements.co2KgPerKwh as HTMLInputElement).value);
-    this.settings.estimationParams.co2KgPerKwh = Number.isFinite(co2Value)
-      ? co2Value
-      : DEFAULT_SETTINGS.estimationParams.co2KgPerKwh;
+    this.settings.estimationParams.kwhPerCall = parseFloat(
+      (this.elements.kwhPerCall as HTMLInputElement).value
+    ) || DEFAULT_SETTINGS.estimationParams.kwhPerCall;
+    this.settings.estimationParams.pue = parseFloat(
+      (this.elements.pue as HTMLInputElement).value
+    ) || DEFAULT_SETTINGS.estimationParams.pue;
+    this.settings.estimationParams.waterLPerKwh = parseFloat(
+      (this.elements.waterLPerKwh as HTMLInputElement).value
+    ) || DEFAULT_SETTINGS.estimationParams.waterLPerKwh;
+    this.settings.estimationParams.co2KgPerKwh = parseFloat(
+      (this.elements.co2KgPerKwh as HTMLInputElement).value
+    ) || DEFAULT_SETTINGS.estimationParams.co2KgPerKwh;
   }
 
   private updatePrivacyWarning(): void {
@@ -290,12 +261,8 @@ class OptionsManager {
 
     if (!domain) return;
 
-    // Basic domain validation allowing ports (e.g., localhost:3000, api.example.com:8080)
-    // Allow wildcards (*.example.com), hostnames with optional ports, and TLDs or localhost
-    // Prevent trailing dots, double dots, leading/trailing hyphens
-    // Updated regex ensures proper domain structure validation
-    const domainRegex = /^(\*\.)?[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]*[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,})?(:[0-9]{1,5})?$/;
-    if (!domainRegex.test(domain)) {
+    // Basic domain validation (allow ports for localhost and custom setups)
+    if (!/^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]+)?(\.[a-zA-Z]{2,}|$)/.test(domain)) {
       alert('Please enter a valid domain (e.g., api.example.com, *.example.com, or localhost:3000)');
       return;
     }
@@ -374,7 +341,10 @@ class OptionsManager {
 
   private async resetToDefaults(): Promise<void> {
     if (confirm('Reset all settings to defaults? This action cannot be undone.')) {
-      this.settings = this.cloneDefaultSettings();
+      this.settings = {
+        ...DEFAULT_SETTINGS,
+        estimationParams: { ...DEFAULT_SETTINGS.estimationParams },
+      };
       this.populateForm();
       this.renderProviders();
       this.updateConnectionStatus();

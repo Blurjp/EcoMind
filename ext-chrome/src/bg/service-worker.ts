@@ -13,7 +13,6 @@ class ServiceWorker {
   private timeManager: TimeManager;
   private initialized = false;
   private readonly boundHandleWebRequest = this.handleWebRequest.bind(this);
-  private readonly boundHandleHeaders = this.handleResponseHeaders.bind(this);
   private readonly boundHandleAlarm = this.handleAlarm.bind(this);
 
   constructor() {
@@ -21,15 +20,6 @@ class ServiceWorker {
     this.providerManager = new ProviderManager();
     this.telemetryManager = TelemetryManager.getInstance();
     this.timeManager = TimeManager.getInstance();
-  }
-
-  // Public accessors for message handlers
-  public getStorageManager(): StorageManager {
-    return this.storageManager;
-  }
-
-  public getTelemetryManager(): TelemetryManager {
-    return this.telemetryManager;
   }
 
   async initialize(): Promise<void> {
@@ -58,27 +48,6 @@ class ServiceWorker {
         ['requestBody']
       );
     }
-
-    // Also listen to response headers for model extraction
-    // Some providers include model info in response headers
-    if (chrome.webRequest && chrome.webRequest.onHeadersReceived) {
-      chrome.webRequest.onHeadersReceived.removeListener(this.boundHandleHeaders);
-      chrome.webRequest.onHeadersReceived.addListener(
-        this.boundHandleHeaders,
-        {
-          urls: ['<all_urls>'],
-          types: ['xmlhttprequest'],
-        },
-        ['responseHeaders']
-      );
-    }
-  }
-
-  private async handleResponseHeaders(
-    details: chrome.webRequest.WebResponseHeadersDetails
-  ): Promise<void> {
-    // Placeholder for future enhancement: extract model from response headers
-    // This would require correlating requests/responses by requestId
   }
 
   private setupAlarmListener(): void {
@@ -123,8 +92,9 @@ class ServiceWorker {
         date: getTodayDate(),
       };
 
-      // Store locally (addUsageRecord now handles badge update internally)
+      // Store locally
       await this.storageManager.addUsageRecord(record);
+      await this.storageManager.incrementTodayCount();
 
       // Send telemetry if enabled
       const settings = await this.storageManager.getSettings();
@@ -178,17 +148,17 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     try {
       switch (message.type) {
         case 'GET_TODAY_COUNT':
-          const count = await serviceWorker.getStorageManager().getTodayCount();
+          const count = await serviceWorker.storageManager.getTodayCount();
           sendResponse({ success: true, data: count });
           break;
 
         case 'GET_TODAY_USAGE':
-          const usage = await serviceWorker.getStorageManager().getTodayUsage();
+          const usage = await serviceWorker.storageManager.getTodayUsage();
           sendResponse({ success: true, data: usage });
           break;
 
         case 'CLEAR_TODAY':
-          await serviceWorker.getStorageManager().clearTodayData();
+          await serviceWorker.storageManager.clearTodayData();
           sendResponse({ success: true });
           break;
 
@@ -199,7 +169,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
         case 'TEST_CONNECTION':
           const { baseUrl } = message;
-          const isConnected = await serviceWorker.getTelemetryManager().testConnection(
+          const isConnected = await serviceWorker.telemetryManager.testConnection(
             baseUrl
           );
           sendResponse({ success: true, data: isConnected });
@@ -208,7 +178,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         case 'FETCH_TODAY_DATA':
           const { baseUrl: fetchBaseUrl, userId } = message;
           try {
-            const data = await serviceWorker.getTelemetryManager().fetchTodayData(
+            const data = await serviceWorker.telemetryManager.fetchTodayData(
               fetchBaseUrl,
               userId
             );
@@ -219,13 +189,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           break;
 
         case 'GET_SETTINGS':
-          const settings = await serviceWorker.getStorageManager().getSettings();
+          const settings = await serviceWorker.storageManager.getSettings();
           sendResponse({ success: true, data: settings });
           break;
 
         case 'SAVE_SETTINGS':
           const { settings: newSettings } = message;
-          await serviceWorker.getStorageManager().saveSettings(newSettings);
+          await serviceWorker.storageManager.saveSettings(newSettings);
           sendResponse({ success: true });
           break;
 

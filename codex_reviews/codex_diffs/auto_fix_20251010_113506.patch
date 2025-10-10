@@ -1,0 +1,15 @@
+diff --git a/src/common/constants.ts b/src/common/constants.ts
+index original..fixed 100644
+--- a/src/common/constants.ts
++++ b/src/common/constants.ts
+@@ -165,7 +165,9 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+     domains: ['api-inference.huggingface.co', 'huggingface.co'],
+     modelExtractor: (url: string, body?: string) => {
+       // Try to extract model from URL path
+-      const match = url.match(/\/models\/([^\/\?]+)/);
++      // HuggingFace uses owner/model format (e.g., mistralai/Mixtral-8x7B-Instruct-v0.1)
++      // Match exactly 2 segments; falls back to body parsing for edge cases
++      const match = url.match(/\/models\/([^\/]+\/[^\/]+)/);
+       if (match) return match[1];
+ 
+       // Try body parsing

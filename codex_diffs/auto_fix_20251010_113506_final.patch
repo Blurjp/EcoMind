@@ -1,0 +1,86 @@
+diff --git a/src/common/constants.ts b/src/common/constants.ts
+index original..fixed 100644
+--- a/src/common/constants.ts
++++ b/src/common/constants.ts
+@@ -165,7 +165,9 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
+     domains: ['api-inference.huggingface.co', 'huggingface.co'],
+     modelExtractor: (url: string, body?: string) => {
+       // Try to extract model from URL path
+-      const match = url.match(/\/models\/([^\/\?]+)/);
++      // HuggingFace uses owner/model format (e.g., mistralai/Mixtral-8x7B-Instruct-v0.1)
++      // Match exactly 2 segments; falls back to body parsing for edge cases
++      const match = url.match(/\/models\/([^\/]+\/[^\/\?]+)/);
+       if (match) return match[1];
+ 
+       // Try body parsing
+diff --git a/tests/providers.test.ts b/tests/providers.test.ts
+index original..fixed 100644
+--- a/tests/providers.test.ts
++++ b/tests/providers.test.ts
+@@ -114,6 +114,59 @@ describe('ProviderManager', () => {
+     it('should extract model from Replicate URL', () => {
+       const result = providerManager.extractModel('https://api.replicate.com/v1/models/meta/llama-2-70b-chat/predictions');
+-      
++
+       expect(result.provider).toBe('replicate');
+       expect(result.model).toBe('meta/llama-2-70b-chat');
+     });
++
++    describe('HuggingFace', () => {
++      it('should extract full owner/model from HuggingFace URL', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('mistralai/Mixtral-8x7B-Instruct-v0.1');
++      });
++
++      it('should extract owner/model with hyphens and underscores', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/meta-llama/Llama-2-7b');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('meta-llama/Llama-2-7b');
++      });
++
++      it('should handle query parameters correctly', () => {
++        const result = providerManager.extractModel('https://huggingface.co/models/facebook/bart-large?query=test');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('facebook/bart-large');
++      });
++
++      it('should handle trailing slashes', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/google/flan-t5-base/');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('google/flan-t5-base');
++      });
++
++      it('should extract model from body if URL has no model path', () => {
++        const body = JSON.stringify({ model: 'my-custom-model' });
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/inference', body);
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('my-custom-model');
++      });
++
++      it('should fall back to huggingface-api for single-segment models', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/gpt2');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('huggingface-api');
++      });
++
++      it('should fall back to huggingface-api when no model in URL or body', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/health');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('huggingface-api');
++      });
++
++      it('should handle complex model names with versions', () => {
++        const result = providerManager.extractModel('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-xl-base-1.0');
++
++        expect(result.provider).toBe('huggingface');
++        expect(result.model).toBe('stabilityai/stable-diffusion-xl-base-1.0');
++      });
++    });

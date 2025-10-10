@@ -1,3 +1,14 @@
+export function matchesDomain(url: string, domain: string): boolean {
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+    // Match exact domain or subdomain
+    return hostname === domain || hostname.endsWith('.' + domain);
+  } catch {
+    return false; // Invalid URL
+  }
+}
+
 export function getTodayDate(): string {
   return new Date().toISOString().split('T')[0];
 }
@@ -18,9 +29,7 @@ export function isValidUrl(url: string): boolean {
 export function extractDomainFromUrl(url: string): string {
   try {
     const { hostname, port } = new URL(url);
-    // Normalize hostname to lowercase for case-insensitive matching
-    const normalizedHostname = hostname.toLowerCase();
-    return port ? `${normalizedHostname}:${port}` : normalizedHostname;
+    return port ? `${hostname}:${port}` : hostname;
   } catch {
     return '';
   }
@@ -46,12 +55,8 @@ export function formatNumber(num: number, decimals = 2): string {
 }
 
 export function domainMatchesPattern(domain: string, pattern: string): boolean {
-  // Normalize both domain and pattern to lowercase for case-insensitive comparison
-  const normalizedDomain = domain.toLowerCase();
-  const normalizedPattern = pattern.toLowerCase();
-
-  const [domainHost, domainPort] = normalizedDomain.split(':');
-  const [patternHost, patternPort] = normalizedPattern.split(':');
+  const [domainHost, domainPort] = domain.split(':');
+  const [patternHost, patternPort] = pattern.split(':');
 
   if (patternPort && patternPort !== domainPort) {
     return false;

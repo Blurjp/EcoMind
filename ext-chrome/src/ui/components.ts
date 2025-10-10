@@ -26,12 +26,19 @@ export function createSection(title: string): HTMLElement {
   return section;
 }
 
-export function createDataRow(label: string, value: string): HTMLElement {
+export function createDataRow(
+  label: string,
+  value: string,
+  title?: string
+): HTMLElement {
   const row = createElement('div', 'data-row');
   const labelEl = createElement('span', 'data-label', label);
   const valueEl = createElement('span', 'data-value', value);
   row.appendChild(labelEl);
   row.appendChild(valueEl);
+  if (title) {
+    labelEl.title = title;
+  }
   return row;
 }
 
@@ -40,12 +47,7 @@ export function createList(
 ): HTMLElement {
   const list = createElement('div', 'data-list');
   items.forEach((item) => {
-    const row = createDataRow(item.label, item.value);
-    if (item.title) {
-      row.setAttribute('title', item.title);
-      row.style.cursor = 'help';
-    }
-    list.appendChild(row);
+    list.appendChild(createDataRow(item.label, item.value, item.title));
   });
   return list;
 }
@@ -56,7 +58,6 @@ export function showLoading(container: HTMLElement): void {
 
 export function showError(container: HTMLElement, message: string): void {
   const errorDiv = createElement('div', 'error');
-  // Use textContent instead of innerHTML to prevent XSS
   errorDiv.textContent = `Error: ${message}`;
   container.innerHTML = '';
   container.appendChild(errorDiv);

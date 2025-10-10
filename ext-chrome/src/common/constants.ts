@@ -1,4 +1,5 @@
 import { ExtensionSettings, ProviderConfig } from './types';
+import { matchesDomain } from './util';
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
   baseUrl: '',
@@ -17,58 +18,44 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
 export const DEFAULT_PROVIDERS: ProviderConfig[] = [
   {
     name: 'openai',
-    domains: ['api.openai.com', 'chatgpt.com', 'chat.openai.com'],
+    domains: ['api.openai.com', 'chatgpt.com', '*.chatgpt.com', 'chat.openai.com', '*.chat.openai.com'],
     modelExtractor: (url: string, body?: string) => {
-      // Try URL extraction for ChatGPT web UI
-      if (url.includes('chatgpt.com')) {
-        // ChatGPT web UI uses /backend-api/conversation endpoint
-        if (url.includes('/backend-api/conversation')) {
-          return 'chatgpt-web';
-        }
-        // GPT-4 model selector in URL params
-        const modelMatch = url.match(/[?&]model=([^&]+)/);
-        if (modelMatch) {
-          return decodeURIComponent(modelMatch[1]);
-        }
-      }
-
+      // Try body parsing first (preserves accuracy when body available)
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'openai-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      // MV3 fallback: URL-based detection when body unavailable
+      if (matchesDomain(url, 'chatgpt.com') || matchesDomain(url, 'chat.openai.com')) {
+        return 'chatgpt';
+      }
+      // Final fallback: OpenAI API (body empty, not web UI)
+      return 'openai-api';
     },
   },
   {
     name: 'anthropic',
-    domains: ['api.anthropic.com', 'claude.ai'],
+    domains: ['api.anthropic.com', 'claude.ai', '*.claude.ai'],
     modelExtractor: (url: string, body?: string) => {
-      // Try URL extraction for Claude web UI
-      if (url.includes('claude.ai')) {
-        // Claude web UI organization URLs sometimes include model hints
-        const modelMatch = url.match(/[?&]model=([^&]+)/);
-        if (modelMatch) {
-          return decodeURIComponent(modelMatch[1]);
-        }
-        // Generic indicator for Claude web interface
-        if (url.includes('/api/organizations/')) {
-          return 'claude-web';
-        }
-      }
-
+      // Try body parsing first (preserves accuracy when body available)
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'anthropic-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      // MV3 fallback: URL-based detection when body unavailable
+      if (matchesDomain(url, 'claude.ai')) {
+        return 'claude';
+      }
+      // Final fallback: Anthropic API (body empty, not web UI)
+      return 'anthropic-api';
     },
   },
   {
@@ -76,7 +63,7 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
     domains: ['api.replicate.com'],
     modelExtractor: (url: string) => {
       const match = url.match(/\/models\/([^\/]+\/[^\/]+)/);
-      return match ? match[1] : 'unknown';
+      return match ? match[1] : 'replicate-api';
     },
   },
   {
@@ -86,12 +73,12 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'together-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      return 'together-api';
     },
   },
   {
@@ -101,12 +88,12 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'cohere-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      return 'cohere-api';
     },
   },
   {
@@ -116,12 +103,12 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
       if (body) {
         try {
           const parsed = JSON.parse(body);
-          return parsed.model || 'unknown';
+          return parsed.model || 'perplexity-api';
         } catch {
           // Ignore parsing errors
         }
       }
-      return 'unknown';
+      return 'perplexity-api';
     },
   },
   {
@@ -137,9 +124,92 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
           // Ignore parsing errors
         }
       }
-      // Fall back to URL extraction (works well for Gemini)
-      const match = url.match(/\/models\/([^\/\?:]+)/);
-      return match ? match[1] : 'unknown';
+      // Fall back to URL extraction
+      const match = url.match(/\/models\/([^\/\?]+)/);
+      return match ? match[1] : 'google-api';
+    },
+  },
+  {
+    name: 'xai',
+    domains: ['api.x.ai'],
+    modelExtractor: (url: string, body?: string) => {
+      // xAI Grok API (OpenAI-compatible)
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          return parsed.model || 'grok';
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+      return 'grok';
+    },
+  },
+  {
+    name: 'mistral',
+    domains: ['api.mistral.ai'],
+    modelExtractor: (url: string, body?: string) => {
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          return parsed.model || 'mistral-api';
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+      return 'mistral-api';
+    },
+  },
+  {
+    name: 'huggingface',
+    domains: ['api-inference.huggingface.co', 'huggingface.co'],
+    modelExtractor: (url: string, body?: string) => {
+      // Try to extract model from URL path
+      // HuggingFace supports both single-segment (e.g., distilbert-base-uncased) and owner/model (e.g., mistralai/Mixtral-8x7B-Instruct-v0.1)
+      // Capture 1-2 path segments after /models/, stopping at query params or additional path segments
+      const match = url.match(/\/models\/([^\/\?]+(?:\/[^\/\?]+)?)/);
+      if (match) return match[1];
+
+      // Try body parsing
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          return parsed.model || 'huggingface-api';
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+      return 'huggingface-api';
+    },
+  },
+  {
+    name: 'openrouter',
+    domains: ['openrouter.ai'],
+    modelExtractor: (url: string, body?: string) => {
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          return parsed.model || 'openrouter-api';
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+      return 'openrouter-api';
+    },
+  },
+  {
+    name: 'groq',
+    domains: ['api.groq.com'],
+    modelExtractor: (url: string, body?: string) => {
+      if (body) {
+        try {
+          const parsed = JSON.parse(body);
+          return parsed.model || 'groq-api';
+        } catch {
+          // Ignore parsing errors
+        }
+      }
+      return 'groq-api';
     },
   },
 ];
