@@ -88,7 +88,7 @@ GitHub: https://github.com/[your-username]/ecomind
 💬 SUPPORT
 
 Questions or feedback? Reach us at:
-• Email: support@ecomind.example.com
+• Email: support@ecomind.biz
 • GitHub Issues: https://github.com/[your-username]/ecomind/issues
 
 Privacy Policy: [Your Privacy Policy URL]
@@ -132,7 +132,7 @@ Track the environmental impact of your AI API usage with Ecomind.
 • Water usage for data centers
 
 GitHub: https://github.com/[your-username]/ecomind
-Support: support@ecomind.example.com
+Support: support@ecomind.biz
 
 Make your AI usage sustainable! 🌱
 ```
@@ -176,7 +176,7 @@ Make your AI usage sustainable! 🌱
 
 ## Support URLs
 
-**Support Email**: support@ecomind.example.com
+**Support Email**: support@ecomind.biz
 
 **Support Website/GitHub**: https://github.com/[your-username]/ecomind/issues
 

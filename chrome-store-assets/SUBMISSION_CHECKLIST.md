@@ -101,7 +101,7 @@ This will create `ecomind-submission.zip` with:
 ## 📝 Notes
 
 - **Version**: Currently 1.0.0 (from manifest.json)
-- **Support email**: Provide during submission (e.g., support@ecomind.ai)
+- **Support email**: Provide during submission (e.g., support@ecomind.biz)
 - **Homepage URL**: Your website or product page
 - **Privacy Policy**: Must be publicly accessible URL (not GitHub)
 

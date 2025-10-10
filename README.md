@@ -388,7 +388,7 @@ Proprietary – All rights reserved
 ## Support
 
 For support inquiries, please contact:
-- Email: support@ecomind.ai
+- Email: support@ecomind.biz
 - Website: https://ecomind.ai
 
 ---

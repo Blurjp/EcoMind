@@ -396,7 +396,7 @@ Target: 100 concurrent users, <500ms p95 latency
 
 - **Docs**: See `docs/` directory
 - **Issues**: Create GitHub issue
-- **Email**: support@ecomind.example.com
+- **Email**: support@ecomind.biz
 
 ---
 

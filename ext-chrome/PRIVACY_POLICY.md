@@ -186,9 +186,9 @@ Ecomind is open source software. You can review our code at:
 
 If you have questions about this Privacy Policy or your data:
 
-- **Email**: privacy@ecomind.example.com
+- **Email**: support@ecomind.biz
 - **GitHub Issues**: https://github.com/[your-username]/ecomind/issues
-- **Support**: support@ecomind.example.com
+- **Support**: support@ecomind.biz
 
 ---
 

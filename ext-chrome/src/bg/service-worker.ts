@@ -59,15 +59,6 @@ class ServiceWorker {
     details: chrome.webRequest.WebRequestBodyDetails
   ): Promise<void> {
     try {
-      // Debug: Log all x.ai or perplexity requests to diagnose tracking issues
-      if (details.url.toLowerCase().includes('x.ai') || details.url.toLowerCase().includes('perplexity')) {
-        console.log('[EcoMind DEBUG] Request detected:', {
-          url: details.url,
-          tracked: this.providerManager.shouldTrackRequest(details.url),
-          provider: this.providerManager.findProviderForUrl(details.url)
-        });
-      }
-
       if (!this.providerManager.shouldTrackRequest(details.url)) {
         return;
       }

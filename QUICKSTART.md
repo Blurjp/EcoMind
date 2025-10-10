@@ -400,7 +400,7 @@ ecomind/
 
 - GitHub: [github.com/ecomind/ecomind](https://github.com/ecomind/ecomind)
 - Issues: [github.com/ecomind/ecomind/issues](https://github.com/ecomind/ecomind/issues)
-- Email: support@ecomind.example.com
+- Email: support@ecomind.biz
 
 ---
 

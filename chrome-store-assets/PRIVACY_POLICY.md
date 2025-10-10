@@ -33,7 +33,7 @@ You may optionally enable backend telemetry by configuring:
 
 ## Data Storage
 
-- **Local Mode**: Data stored in Chrome sync storage (synced across your devices if Chrome sync enabled)
+- **Local Mode**: Data stored in Chrome local storage (persists only on this device, does not sync)
 - **Backend Mode**: Data sent to YOUR configured server (not controlled by EcoMind)
 
 ## Third-Party Services
@@ -67,5 +67,5 @@ We will update this policy as needed. Check the "Last Updated" date above.
 ## Contact
 
 For privacy questions or concerns, please contact us at:
-support@ecomind.ai
+support@ecomind.biz
 

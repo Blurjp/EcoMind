@@ -168,7 +168,7 @@ Additional Details:
 ├── Language: English
 ├── Privacy Policy: [Your hosted URL]
 ├── Homepage URL: https://github.com/ecomind/ecomind-extension
-├── Support Email: support@ecomind.example.com
+├── Support Email: support@ecomind.biz
 └── Support URL: https://github.com/ecomind/ecomind-extension/issues
 
 Privacy Practices:
@@ -228,9 +228,9 @@ Distribution:
 
 **Required for Store Listing**:
 
-- **Support Email**: `support@ecomind.example.com` (replace with real)
+- **Support Email**: `support@ecomind.biz` (replace with real)
 - **Support URL**: GitHub Issues (https://github.com/ecomind/ecomind-extension/issues)
-- **Privacy Email**: `privacy@ecomind.example.com` (replace with real)
+- **Privacy Email**: `support@ecomind.biz` (replace with real)
 - **Homepage**: GitHub repository
 
 **Action Items**:

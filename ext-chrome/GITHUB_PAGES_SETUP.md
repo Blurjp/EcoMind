@@ -54,7 +54,7 @@ cat > docs/index.html << 'EOF'
     <ul>
         <li><a href="https://github.com/Blurjp/EcoMind">GitHub Repository</a></li>
         <li><a href="privacy-policy.html">Privacy Policy</a></li>
-        <li><a href="mailto:support@ecomind.example.com">Support</a></li>
+        <li><a href="mailto:support@ecomind.biz">Support</a></li>
     </ul>
 </body>
 </html>
@@ -501,9 +501,9 @@ cat > docs/privacy-policy.html << 'HTMLEOF'
     <h2>Contact Us</h2>
     <p>If you have questions about this Privacy Policy or your data:</p>
     <ul>
-        <li><strong>Email:</strong> <a href="mailto:privacy@ecomind.example.com">privacy@ecomind.example.com</a></li>
+        <li><strong>Email:</strong> <a href="mailto:support@ecomind.biz">support@ecomind.biz</a></li>
         <li><strong>GitHub Issues:</strong> <a href="https://github.com/Blurjp/EcoMind/issues" target="_blank">https://github.com/Blurjp/EcoMind/issues</a></li>
-        <li><strong>Support:</strong> <a href="mailto:support@ecomind.example.com">support@ecomind.example.com</a></li>
+        <li><strong>Support:</strong> <a href="mailto:support@ecomind.biz">support@ecomind.biz</a></li>
     </ul>
 
     <hr>
@@ -650,7 +650,7 @@ cat > docs/index.html << 'INDEXEOF'
         <h2>Support</h2>
         <p>Need help? Contact us:</p>
         <ul>
-            <li>📧 Email: <a href="mailto:support@ecomind.example.com">support@ecomind.example.com</a></li>
+            <li>📧 Email: <a href="mailto:support@ecomind.biz">support@ecomind.biz</a></li>
             <li>🐛 GitHub Issues: <a href="https://github.com/Blurjp/EcoMind/issues">Report a Bug</a></li>
         </ul>
 

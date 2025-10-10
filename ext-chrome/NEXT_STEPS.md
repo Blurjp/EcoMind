@@ -90,7 +90,7 @@
 #### Additional Details
 - **Privacy Policy**: `https://blurjp.github.io/EcoMind/privacy-policy.html`
 - **Homepage URL**: `https://github.com/Blurjp/EcoMind`
-- **Support Email**: Your email (replace `support@ecomind.example.com`)
+- **Support Email**: Your email (replace `support@ecomind.biz`)
 - **Support URL**: `https://github.com/Blurjp/EcoMind/issues`
 
 #### Privacy Practices
@@ -158,11 +158,11 @@ Before clicking "Submit for Review":
 
 ## Support Email Options
 
-You need to replace `support@ecomind.example.com` with a real email. Options:
+You need to replace `support@ecomind.biz` with a real email. Options:
 
 1. **Personal Email**: Your Gmail or other email
 2. **GitHub Email**: Use your GitHub notifications email
-3. **Create New**: Create `ecomind.support@gmail.com` or similar
+3. **Create New**: Create `support@ecomind.biz` or similar
 4. **Domain Email**: If you own a domain, create `support@yourdomain.com`
 
 **Recommendation**: Use your personal email or create a new Gmail for this project.

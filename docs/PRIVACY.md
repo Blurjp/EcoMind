@@ -54,7 +54,7 @@ The browser extension supports **local-only mode**, where all tracking stays on 
 
 ## GDPR/CCPA Compliance
 
-- **Right to Access**: Request your data via support@ecomind.example.com
+- **Right to Access**: Request your data via support@ecomind.biz
 - **Right to Deletion**: Request deletion of your organization's data
 - **Data Portability**: Export via API or CSV reports
 
@@ -70,4 +70,4 @@ We will notify you of material changes via email or in-app notification.
 
 ## Contact
 
-privacy@ecomind.example.com
+support@ecomind.biz
