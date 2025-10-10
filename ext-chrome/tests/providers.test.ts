@@ -118,6 +118,44 @@ describe('ProviderManager', () => {
       expect(result.model).toBe('meta/llama-2-70b-chat');
     });
 
+    describe('xAI Grok', () => {
+      it('should detect Grok API requests', () => {
+        const result = providerManager.extractModel('https://api.x.ai/v1/chat/completions');
+
+        expect(result.provider).toBe('xai');
+        expect(result.model).toBe('grok');
+      });
+
+      it('should detect Grok web chat requests', () => {
+        const result = providerManager.extractModel('https://grok.com/chat');
+
+        expect(result.provider).toBe('xai');
+        expect(result.model).toBe('grok');
+      });
+
+      it('should detect Grok subdomains', () => {
+        const result = providerManager.extractModel('https://chat.grok.com/api/chat');
+
+        expect(result.provider).toBe('xai');
+        expect(result.model).toBe('grok');
+      });
+
+      it('should detect x.ai domain', () => {
+        const result = providerManager.extractModel('https://x.ai/api/chat');
+
+        expect(result.provider).toBe('xai');
+        expect(result.model).toBe('grok');
+      });
+
+      it('should extract model from body if provided', () => {
+        const body = JSON.stringify({ model: 'grok-beta' });
+        const result = providerManager.extractModel('https://api.x.ai/v1/chat/completions', body);
+
+        expect(result.provider).toBe('xai');
+        expect(result.model).toBe('grok-beta');
+      });
+    });
+
     describe('HuggingFace', () => {
       it('should extract full owner/model from HuggingFace URL', () => {
         const result = providerManager.extractModel('https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1');

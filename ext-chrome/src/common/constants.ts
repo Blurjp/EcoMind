@@ -131,9 +131,9 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
   },
   {
     name: 'xai',
-    domains: ['api.x.ai'],
+    domains: ['api.x.ai', 'grok.com', '*.grok.com', 'x.ai', '*.x.ai'],
     modelExtractor: (url: string, body?: string) => {
-      // xAI Grok API (OpenAI-compatible)
+      // xAI Grok: API (api.x.ai) + Web Chat (grok.com)
       if (body) {
         try {
           const parsed = JSON.parse(body);
