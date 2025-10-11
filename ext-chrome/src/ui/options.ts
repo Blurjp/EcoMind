@@ -22,9 +22,6 @@ class OptionsManager {
       'waterLPerKwh',
       'co2KgPerKwh',
       'providersList',
-      'customProvidersList',
-      'customProviderInput',
-      'addProviderBtn',
       'resetBtn',
       'saveBtn',
       'savedIndicator',
@@ -43,20 +40,6 @@ class OptionsManager {
         this.handleInputChange.bind(this)
       );
     });
-
-    // Custom providers
-    (this.elements.addProviderBtn as HTMLButtonElement).addEventListener(
-      'click',
-      this.addCustomProvider.bind(this)
-    );
-    (this.elements.customProviderInput as HTMLInputElement).addEventListener(
-      'keypress',
-      (e) => {
-        if (e.key === 'Enter') {
-          this.addCustomProvider();
-        }
-      }
-    );
 
     // Action buttons
     (this.elements.resetBtn as HTMLButtonElement).addEventListener(
@@ -102,7 +85,6 @@ class OptionsManager {
   }
 
   private renderProviders(): void {
-    // Default providers
     const providersList = this.elements.providersList;
     providersList.innerHTML = '';
 
@@ -114,40 +96,8 @@ class OptionsManager {
           <div class="provider-name">${provider.name}</div>
           <div class="provider-domains">${provider.domains.join(', ')}</div>
         </div>
-        <span>Default</span>
       `;
       providersList.appendChild(item);
-    });
-
-    // Custom providers
-    this.renderCustomProviders();
-  }
-
-  private renderCustomProviders(): void {
-    const customList = this.elements.customProvidersList;
-    customList.innerHTML = '';
-
-    if (this.settings.customProviders.length === 0) {
-      customList.innerHTML = '<div style="text-align: center; color: #666; padding: 12px;">No custom providers added</div>';
-      return;
-    }
-
-    this.settings.customProviders.forEach((domain, index) => {
-      const item = document.createElement('div');
-      item.className = 'provider-item';
-      item.innerHTML = `
-        <div>
-          <div class="provider-name">${domain}</div>
-          <div class="provider-domains">Custom domain</div>
-        </div>
-        <button class="btn btn-danger btn-small" type="button">Remove</button>
-      `;
-      
-      item
-        .querySelector('button')
-        ?.addEventListener('click', () => this.removeCustomProvider(index));
-      
-      customList.appendChild(item);
     });
   }
 
@@ -168,33 +118,6 @@ class OptionsManager {
     this.settings.estimationParams.co2KgPerKwh = parseFloat(
       (this.elements.co2KgPerKwh as HTMLInputElement).value
     ) || DEFAULT_SETTINGS.estimationParams.co2KgPerKwh;
-  }
-
-  private addCustomProvider(): void {
-    const input = this.elements.customProviderInput as HTMLInputElement;
-    const domain = input.value.trim();
-
-    if (!domain) return;
-
-    // Basic domain validation (allow ports for localhost and custom setups)
-    if (!/^(\*\.)?[a-zA-Z0-9.-]+(:[0-9]+)?(\.[a-zA-Z]{2,}|$)/.test(domain)) {
-      alert('Please enter a valid domain (e.g., api.example.com, *.example.com, or localhost:3000)');
-      return;
-    }
-
-    if (this.settings.customProviders.includes(domain)) {
-      alert('This domain is already added');
-      return;
-    }
-
-    this.settings.customProviders.push(domain);
-    input.value = '';
-    this.renderCustomProviders();
-  }
-
-  private removeCustomProvider(index: number): void {
-    this.settings.customProviders.splice(index, 1);
-    this.renderCustomProviders();
   }
 
   private async saveSettings(): Promise<void> {

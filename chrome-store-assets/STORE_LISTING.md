@@ -35,8 +35,9 @@ EcoMind helps you track and visualize the environmental footprint of your AI API
 - OpenAI (ChatGPT, GPT-4, GPT-3.5)
 - Anthropic (Claude)
 - Google AI (Gemini)
-- Replicate, Together.xyz, Cohere, Perplexity
-- Custom domain support for self-hosted models
+- xAI (Grok)
+- Perplexity
+- HuggingFace, Replicate, Together.xyz, Cohere, Mistral, OpenRouter, Groq
 
 📈 **Daily Dashboard**
 - See total API calls for today
@@ -73,7 +74,7 @@ Free
 **storage**: Required to save your daily usage data and settings locally
 **webRequest**: Required to detect API calls to AI providers
 **alarms**: Required to reset daily counters at midnight
-**host_permissions (<all_urls>)**: Required to monitor requests to various AI provider domains (OpenAI, Anthropic, Google AI, etc.)
+**host_permissions**: Required to monitor requests to 12+ AI provider domains (OpenAI, Anthropic, Google AI, xAI, Perplexity, HuggingFace, Replicate, Together.xyz, Cohere, Mistral, OpenRouter, Groq)
 
 ## Screenshots Needed
 1. Popup showing daily usage (call count, environmental metrics)
