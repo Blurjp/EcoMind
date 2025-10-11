@@ -25,15 +25,30 @@ class ServiceWorker {
   async initialize(): Promise<void> {
     if (this.initialized) return;
     this.initialized = true;
-    
+
     this.setupWebRequestListener();
     this.setupAlarmListener();
     await this.timeManager.setupMidnightReset();
     await this.timeManager.checkAndResetIfNeeded();
 
-    // Load custom providers from settings
+    // Migration: Clean up custom providers (no longer supported in Chrome Web Store version)
+    await this.migrateCustomProviders();
+
+    // Load custom providers from settings (preserved for future enterprise builds)
     const settings = await this.storageManager.getSettings();
     this.providerManager.updateCustomProviders(settings.customProviders);
+  }
+
+  private async migrateCustomProviders(): Promise<void> {
+    const settings = await this.storageManager.getSettings();
+    if (settings.customProviders && settings.customProviders.length > 0) {
+      console.warn(
+        '[EcoMind] Custom providers are no longer supported in this version. ' +
+        'Clearing stored entries. Custom providers will be available in future enterprise builds.'
+      );
+      settings.customProviders = [];
+      await this.storageManager.saveSettings(settings);
+    }
   }
 
   private setupWebRequestListener(): void {

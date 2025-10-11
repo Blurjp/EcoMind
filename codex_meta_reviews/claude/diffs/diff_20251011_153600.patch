@@ -1,0 +1,71 @@
+diff --git a/ext-chrome/src/common/constants.ts b/ext-chrome/src/common/constants.ts
+index abc123..def456 100644
+--- a/ext-chrome/src/common/constants.ts
++++ b/ext-chrome/src/common/constants.ts
+@@ -5,7 +5,6 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
+   userId: '',
+   telemetryEnabled: false,
+   privacyLocalOnly: true,
+-  customProviders: [],
+   estimationParams: {
+     kwhPerCall: 0.0003,
+     pue: 1.5,
+diff --git a/ext-chrome/src/common/types.ts b/ext-chrome/src/common/types.ts
+index abc123..def456 100644
+--- a/ext-chrome/src/common/types.ts
++++ b/ext-chrome/src/common/types.ts
+@@ -24,7 +24,6 @@ export interface ExtensionSettings {
+   userId: string;
+   telemetryEnabled: boolean;
+   privacyLocalOnly: boolean;
+-  customProviders: string[];
+   estimationParams: {
+     kwhPerCall: number;
+     pue: number;
+diff --git a/ext-chrome/src/bg/providers.ts b/ext-chrome/src/bg/providers.ts
+index abc123..def456 100644
+--- a/ext-chrome/src/bg/providers.ts
++++ b/ext-chrome/src/bg/providers.ts
+@@ -60,22 +60,6 @@ export class ProviderManager {
+     return null;
+   }
+
+-  updateCustomProviders(customProviders: string[]): void {
+-    // Clear existing custom providers
+-    this.providers = this.providers.filter(
+-      (p) => !p.name.startsWith('custom-')
+-    );
+-
+-    // Add new custom providers
+-    customProviders.forEach((domain) => {
+-      this.providers.push({
+-        name: `custom-${domain}`,
+-        domains: [domain],
+-        modelExtractor: () => 'custom-model',
+-      });
+-    });
+-  }
+-
+   shouldTrackRequest(url: string): boolean {
+     return this.findProviderForUrl(url) !== null;
+   }
+diff --git a/ext-chrome/src/bg/service-worker.ts b/ext-chrome/src/bg/service-worker.ts
+index abc123..def456 100644
+--- a/ext-chrome/src/bg/service-worker.ts
++++ b/ext-chrome/src/bg/service-worker.ts
+@@ -33,7 +33,6 @@ class ServiceWorker {
+
+     // Load user settings and update provider list
+     const settings = await this.storageManager.getSettings();
+-    this.providerManager.updateCustomProviders(settings.customProviders);
+
+     console.log('[EcoMind] Service worker initialized');
+   }
+@@ -126,7 +125,6 @@ class ServiceWorker {
+
+   private async updateProviders(): Promise<void> {
+     const settings = await this.storageManager.getSettings();
+-    this.providerManager.updateCustomProviders(settings.customProviders);
+   }
+
+   private async handleAlarm(alarm: chrome.alarms.Alarm): Promise<void> {
