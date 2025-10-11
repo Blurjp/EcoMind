@@ -258,6 +258,41 @@ body {
   border: 1px solid #ffeaa7;
 }
 
+.info-box {
+  background: #e8f5e9;
+  color: #1b5e20;
+  padding: 16px;
+  border-radius: 6px;
+  margin: 16px 0;
+  font-size: 14px;
+  border: 1px solid #c8e6c9;
+}
+
+.info-box strong {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 15px;
+  color: #2e7d32;
+}
+
+.info-box ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.info-box ul li {
+  padding: 6px 0 6px 20px;
+  position: relative;
+}
+
+.info-box ul li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4caf50;
+  font-weight: bold;
+}
+
 .custom-providers {
   margin-top: 16px;
 }

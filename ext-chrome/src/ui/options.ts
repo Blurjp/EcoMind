@@ -17,21 +17,14 @@ class OptionsManager {
 
   private initializeElements(): void {
     const ids = [
-      'baseUrl',
-      'userId',
-      'privacyLocalOnly',
-      'telemetryEnabled',
       'kwhPerCall',
       'pue',
       'waterLPerKwh',
       'co2KgPerKwh',
-      'connectionStatus',
-      'privacyWarning',
       'providersList',
       'customProvidersList',
       'customProviderInput',
       'addProviderBtn',
-      'testConnectionBtn',
       'resetBtn',
       'saveBtn',
       'savedIndicator',
@@ -43,26 +36,6 @@ class OptionsManager {
   }
 
   private setupEventListeners(): void {
-    // Form inputs
-    (this.elements.baseUrl as HTMLInputElement).addEventListener(
-      'input',
-      this.handleInputChange.bind(this)
-    );
-    (this.elements.userId as HTMLInputElement).addEventListener(
-      'input',
-      this.handleInputChange.bind(this)
-    );
-
-    // Checkboxes
-    (this.elements.privacyLocalOnly as HTMLInputElement).addEventListener(
-      'change',
-      this.handlePrivacyChange.bind(this)
-    );
-    (this.elements.telemetryEnabled as HTMLInputElement).addEventListener(
-      'change',
-      this.handleInputChange.bind(this)
-    );
-
     // Estimation parameters
     ['kwhPerCall', 'pue', 'waterLPerKwh', 'co2KgPerKwh'].forEach((id) => {
       (this.elements[id] as HTMLInputElement).addEventListener(
@@ -86,10 +59,6 @@ class OptionsManager {
     );
 
     // Action buttons
-    (this.elements.testConnectionBtn as HTMLButtonElement).addEventListener(
-      'click',
-      this.testConnection.bind(this)
-    );
     (this.elements.resetBtn as HTMLButtonElement).addEventListener(
       'click',
       this.resetToDefaults.bind(this)
@@ -115,7 +84,6 @@ class OptionsManager {
         };
         this.populateForm();
         this.renderProviders();
-        this.updateConnectionStatus();
       }
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -123,12 +91,6 @@ class OptionsManager {
   }
 
   private populateForm(): void {
-    (this.elements.baseUrl as HTMLInputElement).value = this.settings.baseUrl;
-    (this.elements.userId as HTMLInputElement).value = this.settings.userId;
-    (this.elements.privacyLocalOnly as HTMLInputElement).checked =
-      this.settings.privacyLocalOnly;
-    (this.elements.telemetryEnabled as HTMLInputElement).checked =
-      this.settings.telemetryEnabled;
     (this.elements.kwhPerCall as HTMLInputElement).value =
       this.settings.estimationParams.kwhPerCall.toString();
     (this.elements.pue as HTMLInputElement).value =
@@ -137,8 +99,6 @@ class OptionsManager {
       this.settings.estimationParams.waterLPerKwh.toString();
     (this.elements.co2KgPerKwh as HTMLInputElement).value =
       this.settings.estimationParams.co2KgPerKwh.toString();
-
-    this.updatePrivacyWarning();
   }
 
   private renderProviders(): void {
@@ -193,21 +153,9 @@ class OptionsManager {
 
   private handleInputChange(): void {
     this.collectFormData();
-    this.updateConnectionStatus();
-  }
-
-  private handlePrivacyChange(): void {
-    this.collectFormData();
-    this.updatePrivacyWarning();
-    this.updateConnectionStatus();
   }
 
   private collectFormData(): void {
-    this.settings.baseUrl = (this.elements.baseUrl as HTMLInputElement).value.trim();
-    this.settings.userId = (this.elements.userId as HTMLInputElement).value.trim();
-    this.settings.privacyLocalOnly = (this.elements.privacyLocalOnly as HTMLInputElement).checked;
-    this.settings.telemetryEnabled = (this.elements.telemetryEnabled as HTMLInputElement).checked;
-
     this.settings.estimationParams.kwhPerCall = parseFloat(
       (this.elements.kwhPerCall as HTMLInputElement).value
     ) || DEFAULT_SETTINGS.estimationParams.kwhPerCall;
@@ -220,39 +168,6 @@ class OptionsManager {
     this.settings.estimationParams.co2KgPerKwh = parseFloat(
       (this.elements.co2KgPerKwh as HTMLInputElement).value
     ) || DEFAULT_SETTINGS.estimationParams.co2KgPerKwh;
-  }
-
-  private updatePrivacyWarning(): void {
-    const warning = this.elements.privacyWarning;
-    const telemetryInput = this.elements.telemetryEnabled as HTMLInputElement;
-    
-    if (this.settings.privacyLocalOnly) {
-      warning.style.display = 'block';
-      telemetryInput.disabled = true;
-    } else {
-      warning.style.display = 'none';
-      telemetryInput.disabled = false;
-    }
-  }
-
-  private updateConnectionStatus(): void {
-    const status = this.elements.connectionStatus;
-    const canConnect = this.settings.baseUrl && this.settings.userId && 
-                       this.settings.telemetryEnabled && !this.settings.privacyLocalOnly;
-
-    if (!this.settings.baseUrl || !this.settings.userId) {
-      status.className = 'status-indicator disabled';
-      status.innerHTML = '<div class="status-dot"></div>Not configured';
-    } else if (this.settings.privacyLocalOnly) {
-      status.className = 'status-indicator disabled';
-      status.innerHTML = '<div class="status-dot"></div>Privacy mode';
-    } else if (!this.settings.telemetryEnabled) {
-      status.className = 'status-indicator disabled';
-      status.innerHTML = '<div class="status-dot"></div>Telemetry disabled';
-    } else {
-      status.className = 'status-indicator disconnected';
-      status.innerHTML = '<div class="status-dot"></div>Ready to test';
-    }
   }
 
   private addCustomProvider(): void {
@@ -280,40 +195,6 @@ class OptionsManager {
   private removeCustomProvider(index: number): void {
     this.settings.customProviders.splice(index, 1);
     this.renderCustomProviders();
-  }
-
-  private async testConnection(): Promise<void> {
-    if (!this.settings.baseUrl) {
-      alert('Please enter a backend URL first');
-      return;
-    }
-
-    const btn = this.elements.testConnectionBtn as HTMLButtonElement;
-    const originalText = btn.textContent;
-    btn.textContent = 'Testing...';
-    btn.disabled = true;
-
-    try {
-      const result = await sendMessage('TEST_CONNECTION', {
-        baseUrl: this.settings.baseUrl,
-      });
-
-      const status = this.elements.connectionStatus;
-      if (result.success && result.data) {
-        status.className = 'status-indicator connected';
-        status.innerHTML = '<div class="status-dot"></div>Connected';
-        alert('Connection successful!');
-      } else {
-        status.className = 'status-indicator disconnected';
-        status.innerHTML = '<div class="status-dot"></div>Connection failed';
-        alert('Connection failed. Please check your backend URL.');
-      }
-    } catch (error) {
-      alert('Error testing connection: ' + (error as Error).message);
-    } finally {
-      btn.textContent = originalText;
-      btn.disabled = false;
-    }
   }
 
   private async saveSettings(): Promise<void> {
@@ -347,7 +228,6 @@ class OptionsManager {
       };
       this.populateForm();
       this.renderProviders();
-      this.updateConnectionStatus();
     }
   }
 }

@@ -13,57 +13,21 @@
       <p>Configure your AI usage tracking and environmental impact estimation</p>
     </div>
 
-    <!-- Backend Configuration -->
-    <div class="section">
-      <div class="section-title">
-        🌐 Backend Configuration
-        <div id="connectionStatus" class="status-indicator disabled">
-          <div class="status-dot"></div>
-          Not configured
-        </div>
-      </div>
-      <div class="section-description">
-        Configure connection to a backend service for centralized tracking and analysis.
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="baseUrl">Backend URL</label>
-        <input type="url" id="baseUrl" class="form-input" placeholder="https://api.example.com">
-        <div class="help-text">Base URL of your backend API service</div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="userId">User ID</label>
-        <input type="text" id="userId" class="form-input" placeholder="user123">
-        <div class="help-text">Unique identifier for your usage data</div>
-      </div>
-
-      <div class="form-group">
-        <button id="testConnectionBtn" class="btn btn-secondary">Test Connection</button>
-      </div>
-    </div>
-
     <!-- Privacy Settings -->
     <div class="section">
       <div class="section-title">🔒 Privacy Settings</div>
       <div class="section-description">
-        Control how your usage data is handled and shared.
+        All your data stays on your device. We never collect or send your usage data anywhere.
       </div>
 
-      <div class="checkbox-group">
-        <input type="checkbox" id="privacyLocalOnly">
-        <label for="privacyLocalOnly">Local-only mode (never send data to backend)</label>
-      </div>
-      <div class="help-text">When enabled, all data stays on your device regardless of other settings</div>
-
-      <div class="checkbox-group">
-        <input type="checkbox" id="telemetryEnabled">
-        <label for="telemetryEnabled">Enable telemetry (send data to backend)</label>
-      </div>
-      <div class="help-text">Send anonymous usage data to configured backend for analysis</div>
-
-      <div class="warning" id="privacyWarning" style="display: none;">
-        ⚠️ Privacy mode is enabled. Telemetry will be disabled regardless of the setting above.
+      <div class="info-box">
+        <strong>✓ Privacy-First Design</strong>
+        <ul>
+          <li>All tracking happens locally in your browser</li>
+          <li>No data is sent to external servers</li>
+          <li>No account or sign-up required</li>
+          <li>You can clear your data anytime from the popup</li>
+        </ul>
       </div>
     </div>
 
