@@ -231,9 +231,62 @@ describe('ProviderManager', () => {
 
     it('should return unknown for unknown provider', () => {
       const result = providerManager.extractModel('https://unknown-api.com/v1/chat');
-      
+
       expect(result.provider).toBe('unknown');
       expect(result.model).toBe('unknown');
+    });
+  });
+
+  describe('Perplexity', () => {
+    it('should extract model from API request body', () => {
+      const body = JSON.stringify({ model: 'llama-3.1-sonar-large-128k-online' });
+      const result = providerManager.extractModel('https://api.perplexity.ai/chat/completions', body);
+
+      expect(result.provider).toBe('perplexity');
+      expect(result.model).toBe('llama-3.1-sonar-large-128k-online');
+    });
+
+    it('should detect perplexity-web from perplexity.ai URL (lowercase)', () => {
+      const result = providerManager.extractModel('https://perplexity.ai/search', undefined);
+
+      expect(result.provider).toBe('perplexity');
+      expect(result.model).toBe('perplexity-web');
+    });
+
+    it('should detect perplexity-web from perplexity.ai URL (mixed case)', () => {
+      const result = providerManager.extractModel('https://Perplexity.AI/search', undefined);
+
+      expect(result.provider).toBe('perplexity');
+      expect(result.model).toBe('perplexity-web');
+    });
+
+    it('should detect perplexity-web from www.perplexity.ai subdomain', () => {
+      const result = providerManager.extractModel('https://www.perplexity.ai/', undefined);
+
+      expect(result.provider).toBe('perplexity');
+      expect(result.model).toBe('perplexity-web');
+    });
+
+    it('should NOT detect perplexity from fake domains', () => {
+      const result = providerManager.extractModel('https://fakeperplexity.ai/search', undefined);
+
+      expect(result.provider).toBe('unknown');
+      expect(result.model).toBe('unknown');
+    });
+
+    it('should prefer body model over URL fallback', () => {
+      const body = JSON.stringify({ model: 'custom-model' });
+      const result = providerManager.extractModel('https://perplexity.ai/api', body);
+
+      expect(result.provider).toBe('perplexity');
+      expect(result.model).toBe('custom-model');
+    });
+
+    it('should return perplexity-api for API without body', () => {
+      const result = providerManager.extractModel('https://api.perplexity.ai/chat/completions', undefined);
+
+      expect(result.provider).toBe('perplexity');
+      expect(result.model).toBe('perplexity-api');
     });
   });
 

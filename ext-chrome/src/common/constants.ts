@@ -98,8 +98,9 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
   },
   {
     name: 'perplexity',
-    domains: ['api.perplexity.ai'],
+    domains: ['api.perplexity.ai', 'perplexity.ai', '*.perplexity.ai'],
     modelExtractor: (url: string, body?: string) => {
+      // Try body parsing first (preserves accuracy when body available)
       if (body) {
         try {
           const parsed = JSON.parse(body);
@@ -108,6 +109,15 @@ export const DEFAULT_PROVIDERS: ProviderConfig[] = [
           // Ignore parsing errors
         }
       }
+      // MV3 fallback: URL-based detection when body unavailable
+      // Check for API subdomain first to avoid matching api.perplexity.ai as web
+      if (matchesDomain(url, 'api.perplexity.ai')) {
+        return 'perplexity-api';
+      }
+      if (matchesDomain(url, 'perplexity.ai')) {
+        return 'perplexity-web';
+      }
+      // Final fallback: Perplexity API (body empty, not web UI)
       return 'perplexity-api';
     },
   },
